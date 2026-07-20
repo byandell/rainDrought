@@ -160,7 +160,30 @@ fig_time.update_layout(
         yanchor="top"
     ),
     margin=dict(t=50),
-    showlegend=False
+    showlegend=False,
+    updatemenus=[
+        dict(
+            type="buttons",
+            direction="right",
+            x=0,
+            y=1.08,
+            xanchor="left",
+            yanchor="bottom",
+            showactive=False,
+            buttons=[
+                dict(
+                    label="Reset View",
+                    method="relayout",
+                    args=[{
+                        "xaxis.autorange": True,
+                        "yaxis.autorange": True,
+                        "yaxis2.autorange": True,
+                        "yaxis3.autorange": True
+                    }]
+                )
+            ]
+        )
+    ]
 )
 fig_time.show()
 ```
@@ -286,7 +309,33 @@ fig_cum_time.update_layout(
     legend=dict(
         groupclick="togglegroup",
         title_text="Year"
-    )
+    ),
+    updatemenus=[
+        dict(
+            type="buttons",
+            direction="right",
+            x=0,
+            y=1.05,
+            xanchor="left",
+            yanchor="bottom",
+            showactive=False,
+            buttons=[
+                dict(
+                    label="Reset View (Show All)",
+                    method="update",
+                    args=[
+                        {"visible": [True] * len(fig_cum_time.data)},
+                        {
+                            "xaxis.autorange": True,
+                            "yaxis.autorange": True,
+                            "yaxis2.autorange": True,
+                            "yaxis3.autorange": True
+                        }
+                    ]
+                )
+            ]
+        )
+    ]
 )
 fig_cum_time.update_xaxes(tickformat="%b", dtick="M1")
 fig_cum_time.show()
@@ -417,7 +466,33 @@ fig_combined_annual.update_layout(
     legend=dict(
         groupclick="togglegroup",
         title_text="Year"
-    )
+    ),
+    updatemenus=[
+        dict(
+            type="buttons",
+            direction="right",
+            x=0,
+            y=1.08,
+            xanchor="left",
+            yanchor="bottom",
+            showactive=False,
+            buttons=[
+                dict(
+                    label="Reset View (Show All)",
+                    method="update",
+                    args=[
+                        {"visible": [True] * len(fig_combined_annual.data)},
+                        {
+                            "xaxis.autorange": True,
+                            "yaxis.autorange": True,
+                            "xaxis2.autorange": True,
+                            "yaxis2.autorange": True
+                        }
+                    ]
+                )
+            ]
+        )
+    ]
 )
 fig_combined_annual.update_xaxes(title_text="Cumulative Precipitation (inches)")
 fig_combined_annual.update_yaxes(title_text="Cumulative DSCI", row=1, col=1)
