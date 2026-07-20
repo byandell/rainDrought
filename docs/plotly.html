@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>chats – SD Rain &amp; Drought Analysis</title>
+<title>plotly – SD Rain &amp; Drought Analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -4790,12 +4790,18 @@ vertical-align: -.125em;
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#ai-conversation-record" id="toc-ai-conversation-record" class="nav-link active" data-scroll-target="#ai-conversation-record">AI Conversation Record</a>
+  <li><a href="#plotly-with-quarto" id="toc-plotly-with-quarto" class="nav-link active" data-scroll-target="#plotly-with-quarto">Plotly with Quarto</a>
   <ul class="collapse">
-  <li><a href="#weekly-monthly-drought-tracking" id="toc-weekly-monthly-drought-tracking" class="nav-link" data-scroll-target="#weekly-monthly-drought-tracking">1. Weekly &amp; Monthly Drought Tracking</a></li>
-  <li><a href="#daily-historical-precipitation-records" id="toc-daily-historical-precipitation-records" class="nav-link" data-scroll-target="#daily-historical-precipitation-records">2. Daily &amp; Historical Precipitation Records</a></li>
-  <li><a href="#local-data-collection-visualization-website" id="toc-local-data-collection-visualization-website" class="nav-link" data-scroll-target="#local-data-collection-visualization-website">3. Local Data Collection &amp; Visualization Website</a></li>
-  <li><a href="#deploying-to-github-pages" id="toc-deploying-to-github-pages" class="nav-link" data-scroll-target="#deploying-to-github-pages">4. Deploying to GitHub Pages</a></li>
+  <li><a href="#plotly-double-click-behavior" id="toc-plotly-double-click-behavior" class="nav-link" data-scroll-target="#plotly-double-click-behavior">Plotly Double Click Behavior</a>
+  <ul class="collapse">
+  <li><a href="#the-problem" id="toc-the-problem" class="nav-link" data-scroll-target="#the-problem">The Problem</a></li>
+  <li><a href="#the-solution-use-legend_itemclick-and-legend_itemdoubleclick" id="toc-the-solution-use-legend_itemclick-and-legend_itemdoubleclick" class="nav-link" data-scroll-target="#the-solution-use-legend_itemclick-and-legend_itemdoubleclick">The Solution: Use <code>legend_itemclick</code> and <code>legend_itemdoubleclick</code></a></li>
+  <li><a href="#why-this-fixes-it" id="toc-why-this-fixes-it" class="nav-link" data-scroll-target="#why-this-fixes-it">Why this fixes it</a></li>
+  </ul></li>
+  <li><a href="#toggle3-error" id="toc-toggle3-error" class="nav-link" data-scroll-target="#toggle3-error">toggle3 error</a>
+  <ul class="collapse">
+  <li><a href="#why-this-works" id="toc-why-this-works" class="nav-link" data-scroll-target="#why-this-works">Why this works</a></li>
+  </ul></li>
   </ul></li>
   </ul>
 </nav>
@@ -4806,75 +4812,101 @@ vertical-align: -.125em;
 
 
 
-<section id="ai-conversation-record" class="level1">
-<h1>AI Conversation Record</h1>
-<p><strong>Prompt:</strong></p>
+<section id="plotly-with-quarto" class="level1">
+<h1>Plotly with Quarto</h1>
+<section id="plotly-double-click-behavior" class="level2">
+<h2 class="anchored" data-anchor-id="plotly-double-click-behavior">Plotly Double Click Behavior</h2>
+<p><strong>Prompt:</strong> I should be able to double-click on a year in the legend of the plotly figure and see only that year. Code block is just above. Why is it not working?</p>
+<p><strong>Response:</strong> The reason the double-click behavior isn’t working as expected is due to the <code>legendgroup</code> and <code>showlegend</code> configuration inside your loop:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>fig_cum_time.add_trace(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    go.Scatter(</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>        ...</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        name <span class="op">=</span> year, </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        legendgroup <span class="op">=</span> year, </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        showlegend <span class="op">=</span> <span class="va">True</span>  <span class="co"># Only True for the first trace of each year</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    row <span class="op">=</span> <span class="dv">1</span>, col <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>fig_cum_time.add_trace(</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    go.Scatter(</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        ...</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        name <span class="op">=</span> year, </span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        legendgroup <span class="op">=</span> year, </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        showlegend <span class="op">=</span> <span class="va">False</span> <span class="co"># False for subsequent traces in that group</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    row <span class="op">=</span> <span class="dv">1</span>, col <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="the-problem" class="level3">
+<h3 class="anchored" data-anchor-id="the-problem">The Problem</h3>
+<p>When you use <code>legendgroup</code> combined with <code>showlegend = False</code> on subsequent traces, Plotly matches them up for simple single-click toggles (<code>groupclick = &quot;togglegroup&quot;</code>). However, Plotly’s native <strong>double-click isolation logic</strong> only fully applies out-of-the-box to the specific trace that is explicitly bound to the legend item.</p>
+<p>When you double-click, Plotly attempts to isolate <em>only</em> the specific traces that have an active legend entry (<code>showlegend=True</code>). Because the other subplots and marker traces have <code>showlegend=False</code>, Plotly’s internal filtering gets confused across multiple rows, failing to isolate the entire group correctly.</p>
+<hr>
+</section>
+<section id="the-solution-use-legend_itemclick-and-legend_itemdoubleclick" class="level3">
+<h3 class="anchored" data-anchor-id="the-solution-use-legend_itemclick-and-legend_itemdoubleclick">The Solution: Use <code>legend_itemclick</code> and <code>legend_itemdoubleclick</code></h3>
+<p>To fix this and force Plotly to natively isolate the entire group on a double-click, you need to explicitly tell the legend layout how to handle group interactions by adding <code>itemclick=&quot;toggle3&quot;</code> and <code>itemdoubleclick=&quot;isolate3&quot;</code> to your legend configuration.</p>
+<p>Update your <code>fig.update_layout</code> call (around line 214 or 322 depending on which plot you are updating) to include these parameters:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>fig_cum_time.update_layout(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    height <span class="op">=</span> <span class="dv">880</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    template <span class="op">=</span> <span class="st">&quot;plotly_white&quot;</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    title <span class="op">=</span> <span class="bu">dict</span>(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        text <span class="op">=</span> <span class="st">&quot;Annual Progression of Cumulative Climate Metrics&quot;</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        y <span class="op">=</span> <span class="fl">0.95</span>, x <span class="op">=</span> <span class="fl">0.5</span>, xanchor <span class="op">=</span> <span class="st">&quot;center&quot;</span>, yanchor <span class="op">=</span> <span class="st">&quot;top&quot;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    margin <span class="op">=</span> <span class="bu">dict</span>(t <span class="op">=</span> <span class="dv">90</span>),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    legend <span class="op">=</span> <span class="bu">dict</span>(</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="co"># groupclick=&quot;togglegroup&quot;,  &lt;-- You can replace or keep this, but the below are safer for multi-subplots</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        itemclick <span class="op">=</span> <span class="st">&quot;toggle3&quot;</span>,         <span class="co"># Single-click toggles the entire group</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        itemdoubleclick <span class="op">=</span> <span class="st">&quot;isolate3&quot;</span>,  <span class="co"># Double-click isolates the entire group</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        title_text <span class="op">=</span> <span class="st">&quot;Year&quot;</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="why-this-fixes-it" class="level3">
+<h3 class="anchored" data-anchor-id="why-this-fixes-it">Why this fixes it</h3>
 <ul>
-<li>Find periodic (daily, weekly, monthly) records of rainfall and drought index for South Dakota, ideally for Oglala Lakota County.</li>
-<li>Collect and store locally in folder <code>data/</code> weekly drought records for Oglala Lakota County and daily precipitation records for South Dakota for the past 10 years. Cite sources.Write code in python as a Quarto document for this.</li>
-<li>Create a Quarto document that plots the drought and precipitation records using python package <a href="https://plotnine.org/">plotnine</a>. First plot data over time.</li>
-</ul>
-<p><strong>Results:</strong> You can track both precipitation and drought index metrics for South Dakota, Oglala Lakota County, and Todd County across periodic intervals (daily, weekly, and monthly) through several authoritative repositories:</p>
-<section id="weekly-monthly-drought-tracking" class="level3">
-<h3 class="anchored" data-anchor-id="weekly-monthly-drought-tracking">1. Weekly &amp; Monthly Drought Tracking</h3>
-<ul>
-<li><strong>County Conditions dashboards (Drought.gov)</strong>:
-<ul>
-<li><strong><a href="https://www.drought.gov/states/south-dakota/county/oglala%20lakota">Oglala Lakota County Conditions</a></strong></li>
-<li><strong><a href="https://www.drought.gov/states/south-dakota/county/todd">Todd County Conditions</a></strong> These are the most direct dashboards for each county, aggregating weekly <strong>U.S. Drought Monitor</strong> updates (released every Thursday) alongside the <strong>Standardized Precipitation Index (SPI)</strong>, which measures objective departures from normal rainfall.</li>
-</ul></li>
-<li><strong><a href="https://droughtmonitor.unl.edu/CurrentMap/StateDroughtMonitor.aspx?SD">U.S. Drought Monitor (South Dakota)</a>:</strong> Tracks percentage area classifications (from D0 “Abnormally Dry” to D4 “Exceptional Drought”) on a weekly basis across the state. You can download spatial and tabular data summaries filtered explicitly down to individual counties like Oglala Lakota and Todd.</li>
+<li><strong><code>toggle3</code></strong>: Directs a single-click to toggle all traces sharing that <code>legendgroup</code>.</li>
+<li><strong><code>isolate3</code></strong>: Directs a double-click to hide everything <em>except</em> all traces sharing the clicked <code>legendgroup</code> across all subplots and rows.</li>
 </ul>
 </section>
-<section id="daily-historical-precipitation-records" class="level3">
-<h3 class="anchored" data-anchor-id="daily-historical-precipitation-records">2. Daily &amp; Historical Precipitation Records</h3>
-<ul>
-<li><strong><a href="https://sdgrass.org/tools-for-drought-planning/">South Dakota Mesonet Archives</a>:</strong> Operated via South Dakota State University, the Mesonet offers <strong>daily</strong> cumulative curves of precipitation plotted against 30-year climate normals. You can use their “Local Data” climate archives tab to isolate specific weather stations, dates, or individual monthly records. It also maps real-time soil moisture and the 4-week Evaporative Demand Drought Index (EDDI).</li>
-<li><strong><a href="https://toolkit.climate.gov/tool/south-dakota-drought-dashboard">South Dakota Drought Dashboard</a>:</strong> Hosted via the U.S. Climate Resilience Toolkit, this offers map-based regional tracking combining short-term 1–7 day precipitation forecasts with historical monthly monitoring.</li>
-<li><strong><a href="https://data.pressconnects.com/weather-data/oglala-lakota-county/46102/2024-01-01/">NCEI County-Level Climate Data</a>:</strong> For raw monthly records dating back to 1895, the National Centers for Environmental Information (NCEI) updates monthly precipitation, rainfall, and temperature data specifically mapped to counties like Oglala Lakota and Todd.</li>
-</ul>
 </section>
-<section id="local-data-collection-visualization-website" class="level3">
-<h3 class="anchored" data-anchor-id="local-data-collection-visualization-website">3. Local Data Collection &amp; Visualization Website</h3>
-<p>The project is structured as a multi-page Quarto website configured via <strong><a href="_quarto.yml">_quarto.yml</a></strong>. All compiled HTML pages have resources fully embedded and are output directly to the <strong><a href="docs/">docs/</a></strong> folder (with local <code>site_libs</code> excluded from git), ready for seamless deployment to GitHub Pages.</p>
-<ul>
-<li><strong><a href="./index.html">index.qmd</a></strong>: The home page for the Quarto website, serving as an overview of project goals, sources, and data workflows.</li>
-<li><strong><a href="./collect_data.html">collect_data.qmd</a></strong>: A Python-based Quarto pipeline that fetches and stores the 10-year datasets in the <code>data/</code> directory.
-<ul>
-<li>Saves weekly drought records for Oglala Lakota County to <a href="data/oglala_lakota_drought_weekly.csv">oglala_lakota_drought_weekly.csv</a>.</li>
-<li>Saves weekly drought records for Todd County to <a href="data/todd_drought_weekly.csv">todd_drought_weekly.csv</a>.</li>
-<li>Saves daily statewide average precipitation records to <a href="data/south_dakota_precipitation_daily.csv">south_dakota_precipitation_daily.csv</a>.</li>
-<li>Generates static 10-year climate visualizations inside the report.</li>
-</ul></li>
-<li><strong><a href="./plot_records.html">plot_records.qmd</a></strong>: A Quarto document utilizing <strong><a href="https://plotly.com/python/">Plotly</a></strong> to build interactive, responsive visualizations. Code blocks are <strong>hidden/folded by default</strong> (<code>code-fold: true</code>) for a clean visual presentation, but can be expanded interactively. Double-click explicitly included in legend with <code>groupclick=&quot;togglegroup&quot;</code>; allow <code>Reset View</code> with <code>buttons</code> update in lower right to re-render the plots from stored data.
-<ul>
-<li><strong>10-Year Timelines</strong>: Plots weekly drought indices (DSCI) for both counties and the statewide rolling precipitation in a 3-panel layout.</li>
-<li><strong>Time vs. Cumulative values</strong>: Plots time within the year (standardized month, X-axis) vs. annual cumulative values (Y-axis) in a 3-panel layout with separate colored curves by year and month-end markers.</li>
-<li><strong>Annual Cumulative Trajectories</strong>: Plots annual cumulative rain vs. cumulative drought index (DSCI) for both counties as two facets side-by-side on the same plot surface, with separate colored curves by year and month-end markers. Features overlaid <strong>DRY</strong> (upper-left) and <strong>WET</strong> (lower-right) background watermark labels, group-toggled legends for isolating individual years, and a detailed interpretation guide.</li>
-</ul></li>
-</ul>
-<p>To build and compile the entire website, run:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="deploying-to-github-pages" class="level3">
-<h3 class="anchored" data-anchor-id="deploying-to-github-pages">4. Deploying to GitHub Pages</h3>
-<p>To publish the interactive site:</p>
-<ol type="1">
-<li>Commit and push the repository, including the compiled <code>/docs</code> folder, to GitHub.</li>
-<li>Navigate to your repository page on GitHub.</li>
-<li>Select <strong>Settings</strong> -&gt; <strong>Pages</strong> (under the “Code and automation” section).</li>
-<li>Under <strong>Build and deployment</strong>:
-<ul>
-<li>Set <strong>Source</strong> to <code>Deploy from a branch</code>.</li>
-<li>Set <strong>Branch</strong> to <code>main</code> (or your active branch) and select <code>/docs</code> as the source folder.</li>
-</ul></li>
-<li>Click <strong>Save</strong>.</li>
-</ol>
-<p>The interactive dashboards will be live shortly at <code>https://&lt;your-username&gt;.github.io/&lt;your-repo-name&gt;/</code>.</p>
+<section id="toggle3-error" class="level2">
+<h2 class="anchored" data-anchor-id="toggle3-error">toggle3 error</h2>
+<p><strong>Prompt:</strong> I get the following error:</p>
+<pre><code>Invalid value of type &#39;builtins.str&#39; received for the &#39;itemclick&#39; property of layout.legend
+        Received value: &#39;toggle3&#39;
+
+    The &#39;itemclick&#39; property is an enumeration that may be specified as:
+      - One of the following enumeration values:
+            [&#39;toggle&#39;, &#39;toggleothers&#39;, False]</code></pre>
+<p><strong>Response:</strong> Ah, good catch! The reason you are getting that error is that <code>toggle3</code> and <code>isolate3</code> are features designed for Plotly’s JavaScript engine (and are available in more recent frontend versions of the library), but the Python wrapper’s strict validator blocks them because they aren’t explicitly hardcoded into Python’s <code>layout.legend.itemclick</code> validation list yet.</p>
+<p>Since Python rejects the strings, you can completely bypass the strict validator by updating the properties inside a dictionary instead.</p>
+<p>Change your legend configuration in <code>fig_cum_time.update_layout</code> (and <code>fig_combined_annual</code> if you are updating that one too) to use standard Python values first, and then inject the correct JavaScript behaviors using dictionary assignment:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Update the layout normally without itemclick/itemdoubleclick</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>fig_cum_time.update_layout(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    height <span class="op">=</span> <span class="dv">880</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    template <span class="op">=</span> <span class="st">&quot;plotly_white&quot;</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    title <span class="op">=</span> <span class="bu">dict</span>(</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        text <span class="op">=</span> <span class="st">&quot;Annual Progression of Cumulative Climate Metrics&quot;</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        y <span class="op">=</span> <span class="fl">0.95</span>, x <span class="op">=</span> <span class="fl">0.5</span>, xanchor <span class="op">=</span> <span class="st">&quot;center&quot;</span>, yanchor <span class="op">=</span> <span class="st">&quot;top&quot;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    margin <span class="op">=</span> <span class="bu">dict</span>(t <span class="op">=</span> <span class="dv">90</span>),</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    legend <span class="op">=</span> <span class="bu">dict</span>(</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        title_text <span class="op">=</span> <span class="st">&quot;Year&quot;</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Bypass the strict Python validator by injecting the strings directly into the dictionary</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>fig_cum_time.layout.legend.itemclick <span class="op">=</span> <span class="st">&quot;toggle3&quot;</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>fig_cum_time.layout.legend.itemdoubleclick <span class="op">=</span> <span class="st">&quot;isolate3&quot;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="why-this-works" class="level3">
+<h3 class="anchored" data-anchor-id="why-this-works">Why this works</h3>
+<p>By assigning them via <code>fig_cum_time.layout.legend.itemclick = &quot;toggle3&quot;</code>, you sneak the values directly into the underlying figure dictionary. When Plotly exports the plot data to your browser, the Javascript side will receive <code>&quot;toggle3&quot;</code> and <code>&quot;isolate3&quot;</code>, recognize them perfectly, and isolate all of your subplots and markers across your entire figure on a double-click!</p>
 
 
 <!-- -->
 
+</section>
 </section>
 </section>
 
@@ -5350,69 +5382,120 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class>
-<div class="sourceCode" id="cb2" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># AI Conversation Record</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>**Prompt:**</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Find periodic (daily, weekly, monthly) records of rainfall and drought index</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>for South Dakota, ideally for Oglala Lakota County.</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Collect and store locally in folder <span class="in">`data/`</span> weekly drought records for Oglala Lakota County and daily precipitation records for South Dakota for the past 10 years. Cite sources.Write code in python as a Quarto document for this.</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Create a Quarto document that plots the drought and precipitation records using python package</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">plotnine</span><span class="co">](https://plotnine.org/)</span>.</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>First plot data over time.</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>**Results:**</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>You can track both precipitation and drought index metrics for South Dakota, Oglala Lakota County, and Todd County across periodic intervals (daily, weekly, and monthly) through several authoritative repositories:</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="fu">### 1. Weekly &amp; Monthly Drought Tracking</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**County Conditions dashboards (Drought.gov)**:</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>**[Oglala Lakota County Conditions](https://www.drought.gov/states/south-dakota/county/oglala%20lakota)**</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>**[Todd County Conditions](https://www.drought.gov/states/south-dakota/county/todd)**</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  These are the most direct dashboards for each county, aggregating weekly **U.S. Drought Monitor** updates (released every Thursday) alongside the **Standardized Precipitation Index (SPI)**, which measures objective departures from normal rainfall.</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[U.S. Drought Monitor (South Dakota)](https://droughtmonitor.unl.edu/CurrentMap/StateDroughtMonitor.aspx?SD):** Tracks percentage area classifications (from D0 &quot;Abnormally Dry&quot; to D4 &quot;Exceptional Drought&quot;) on a weekly basis across the state. You can download spatial and tabular data summaries filtered explicitly down to individual counties like Oglala Lakota and Todd.</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2. Daily &amp; Historical Precipitation Records</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[South Dakota Mesonet Archives](https://sdgrass.org/tools-for-drought-planning/):** Operated via South Dakota State University, the Mesonet offers **daily** cumulative curves of precipitation plotted against 30-year climate normals. You can use their &quot;Local Data&quot; climate archives tab to isolate specific weather stations, dates, or individual monthly records. It also maps real-time soil moisture and the 4-week Evaporative Demand Drought Index (EDDI).</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[South Dakota Drought Dashboard](https://toolkit.climate.gov/tool/south-dakota-drought-dashboard):** Hosted via the U.S. Climate Resilience Toolkit, this offers map-based regional tracking combining short-term 1–7 day precipitation forecasts with historical monthly monitoring.</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[NCEI County-Level Climate Data](https://data.pressconnects.com/weather-data/oglala-lakota-county/46102/2024-01-01/):** For raw monthly records dating back to 1895, the National Centers for Environmental Information (NCEI) updates monthly precipitation, rainfall, and temperature data specifically mapped to counties like Oglala Lakota and Todd.</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="fu">### 3. Local Data Collection &amp; Visualization Website</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>The project is structured as a multi-page Quarto website configured via **[_quarto.yml](_quarto.yml)**. All compiled HTML pages have resources fully embedded and are output directly to the **[docs/](docs/)** folder (with local <span class="in">`site_libs`</span> excluded from git), ready for seamless deployment to GitHub Pages.</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[index.qmd](index.qmd)**: The home page for the Quarto website, serving as an overview of project goals, sources, and data workflows.</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[collect_data.qmd](collect_data.qmd)**: A Python-based Quarto pipeline that fetches and stores the 10-year datasets in the <span class="in">`data/`</span> directory.</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>Saves weekly drought records for Oglala Lakota County to <span class="co">[</span><span class="ot">oglala_lakota_drought_weekly.csv</span><span class="co">](data/oglala_lakota_drought_weekly.csv)</span>.</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>Saves weekly drought records for Todd County to <span class="co">[</span><span class="ot">todd_drought_weekly.csv</span><span class="co">](data/todd_drought_weekly.csv)</span>.</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>Saves daily statewide average precipitation records to <span class="co">[</span><span class="ot">south_dakota_precipitation_daily.csv</span><span class="co">](data/south_dakota_precipitation_daily.csv)</span>.</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>Generates static 10-year climate visualizations inside the report.</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[plot_records.qmd](plot_records.qmd)**: A Quarto document utilizing **[Plotly](https://plotly.com/python/)** to build interactive, responsive visualizations. Code blocks are **hidden/folded by default** (<span class="in">`code-fold: true`</span>) for a clean visual presentation, but can be expanded interactively. Double-click explicitly included in legend with <span class="in">`groupclick=&quot;togglegroup&quot;`</span>;</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>allow <span class="in">`Reset View`</span> with <span class="in">`buttons`</span> update in lower right to re-render the plots from stored data.</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>**10-Year Timelines**: Plots weekly drought indices (DSCI) for both counties and the statewide rolling precipitation in a 3-panel layout.</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>**Time vs. Cumulative values**: Plots time within the year (standardized month, X-axis) vs. annual cumulative values (Y-axis) in a 3-panel layout with separate colored curves by year and month-end markers.</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>**Annual Cumulative Trajectories**: Plots annual cumulative rain vs. cumulative drought index (DSCI) for both counties as two facets side-by-side on the same plot surface, with separate colored curves by year and month-end markers. Features overlaid **DRY** (upper-left) and **WET** (lower-right) background watermark labels, group-toggled legends for isolating individual years, and a detailed interpretation guide.</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>To build and compile the entire website, run:</span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render</span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a><span class="fu">### 4. Deploying to GitHub Pages</span></span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>To publish the interactive site:</span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Commit and push the repository, including the compiled <span class="in">`/docs`</span> folder, to GitHub.</span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Navigate to your repository page on GitHub.</span>
-<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Select **Settings** -&gt; **Pages** (under the &quot;Code and automation&quot; section).</span>
-<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Under **Build and deployment**:</span>
-<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Set **Source** to <span class="in">`Deploy from a branch`</span>.</span>
-<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Set **Branch** to <span class="in">`main`</span> (or your active branch) and select <span class="in">`/docs`</span> as the source folder.</span>
-<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>Click **Save**.</span>
-<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>The interactive dashboards will be live shortly at <span class="in">`https://&lt;your-username&gt;.github.io/&lt;your-repo-name&gt;/`</span>.</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Plotly with Quarto</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">## Plotly Double Click Behavior</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>**Prompt:**</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>I should be able to double-click on a year in the legend of the plotly figure and see only that year. Code block is just above. Why is it not working?</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>**Response:**</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>The reason the double-click behavior isn&#39;t working as expected is due to the <span class="in">`legendgroup`</span> and <span class="in">`showlegend`</span> configuration inside your loop:</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>fig_cum_time.add_trace(</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    go.Scatter(</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        ...</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        name <span class="op">=</span> year, </span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        legendgroup <span class="op">=</span> year, </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        showlegend <span class="op">=</span> <span class="va">True</span>  <span class="co"># Only True for the first trace of each year</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    row <span class="op">=</span> <span class="dv">1</span>, col <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>fig_cum_time.add_trace(</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    go.Scatter(</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        ...</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>        name <span class="op">=</span> year, </span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>        legendgroup <span class="op">=</span> year, </span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>        showlegend <span class="op">=</span> <span class="va">False</span> <span class="co"># False for subsequent traces in that group</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    row <span class="op">=</span> <span class="dv">1</span>, col <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="fu">### The Problem</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>When you use <span class="in">`legendgroup`</span> combined with <span class="in">`showlegend = False`</span> on subsequent traces, Plotly matches them up for simple single-click toggles (<span class="in">`groupclick = &quot;togglegroup&quot;`</span>). However, Plotly&#39;s native **double-click isolation logic** only fully applies out-of-the-box to the specific trace that is explicitly bound to the legend item.</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>When you double-click, Plotly attempts to isolate *only* the specific traces that have an active legend entry (<span class="in">`showlegend=True`</span>). Because the other subplots and marker traces have <span class="in">`showlegend=False`</span>, Plotly&#39;s internal filtering gets confused across multiple rows, failing to isolate the entire group correctly.</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a><span class="fu">### The Solution: Use `legend_itemclick` and `legend_itemdoubleclick`</span></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>To fix this and force Plotly to natively isolate the entire group on a double-click, you need to explicitly tell the legend layout how to handle group interactions by adding <span class="in">`itemclick=&quot;toggle3&quot;`</span> and <span class="in">`itemdoubleclick=&quot;isolate3&quot;`</span> to your legend configuration.</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>Update your <span class="in">`fig.update_layout`</span> call (around line 214 or 322 depending on which plot you are updating) to include these parameters:</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>fig_cum_time.update_layout(</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    height <span class="op">=</span> <span class="dv">880</span>,</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    template <span class="op">=</span> <span class="st">&quot;plotly_white&quot;</span>,</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>    title <span class="op">=</span> <span class="bu">dict</span>(</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>        text <span class="op">=</span> <span class="st">&quot;Annual Progression of Cumulative Climate Metrics&quot;</span>,</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>        y <span class="op">=</span> <span class="fl">0.95</span>, x <span class="op">=</span> <span class="fl">0.5</span>, xanchor <span class="op">=</span> <span class="st">&quot;center&quot;</span>, yanchor <span class="op">=</span> <span class="st">&quot;top&quot;</span></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>    margin <span class="op">=</span> <span class="bu">dict</span>(t <span class="op">=</span> <span class="dv">90</span>),</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>    legend <span class="op">=</span> <span class="bu">dict</span>(</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>        <span class="co"># groupclick=&quot;togglegroup&quot;,  &lt;-- You can replace or keep this, but the below are safer for multi-subplots</span></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>        itemclick <span class="op">=</span> <span class="st">&quot;toggle3&quot;</span>,         <span class="co"># Single-click toggles the entire group</span></span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>        itemdoubleclick <span class="op">=</span> <span class="st">&quot;isolate3&quot;</span>,  <span class="co"># Double-click isolates the entire group</span></span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>        title_text <span class="op">=</span> <span class="st">&quot;Year&quot;</span></span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a><span class="fu">### Why this fixes it</span></span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>**`toggle3`**: Directs a single-click to toggle all traces sharing that <span class="in">`legendgroup`</span>.</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>**`isolate3`**: Directs a double-click to hide everything *except* all traces sharing the clicked <span class="in">`legendgroup`</span> across all subplots and rows.</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a><span class="fu">## toggle3 error</span></span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>**Prompt:**</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>I get the following error:</span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a><span class="in">Invalid value of type &#39;builtins.str&#39; received for the &#39;itemclick&#39; property of layout.legend</span></span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a><span class="in">        Received value: &#39;toggle3&#39;</span></span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a><span class="in">    The &#39;itemclick&#39; property is an enumeration that may be specified as:</span></span>
+<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a><span class="in">      - One of the following enumeration values:</span></span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a><span class="in">            [&#39;toggle&#39;, &#39;toggleothers&#39;, False]</span></span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>**Response:**</span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>Ah, good catch! The reason you are getting that error is that <span class="in">`toggle3`</span> and <span class="in">`isolate3`</span> are features designed for Plotly&#39;s JavaScript engine (and are available in more recent frontend versions of the library), but the Python wrapper&#39;s strict validator blocks them because they aren&#39;t explicitly hardcoded into Python&#39;s <span class="in">`layout.legend.itemclick`</span> validation list yet.</span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a>Since Python rejects the strings, you can completely bypass the strict validator by updating the properties inside a dictionary instead.</span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a>Change your legend configuration in <span class="in">`fig_cum_time.update_layout`</span> (and <span class="in">`fig_combined_annual`</span> if you are updating that one too) to use standard Python values first, and then inject the correct JavaScript behaviors using dictionary assignment:</span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Update the layout normally without itemclick/itemdoubleclick</span></span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a>fig_cum_time.update_layout(</span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a>    height <span class="op">=</span> <span class="dv">880</span>,</span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a>    template <span class="op">=</span> <span class="st">&quot;plotly_white&quot;</span>,</span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a>    title <span class="op">=</span> <span class="bu">dict</span>(</span>
+<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a>        text <span class="op">=</span> <span class="st">&quot;Annual Progression of Cumulative Climate Metrics&quot;</span>,</span>
+<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a>        y <span class="op">=</span> <span class="fl">0.95</span>, x <span class="op">=</span> <span class="fl">0.5</span>, xanchor <span class="op">=</span> <span class="st">&quot;center&quot;</span>, yanchor <span class="op">=</span> <span class="st">&quot;top&quot;</span></span>
+<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a>    margin <span class="op">=</span> <span class="bu">dict</span>(t <span class="op">=</span> <span class="dv">90</span>),</span>
+<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a>    legend <span class="op">=</span> <span class="bu">dict</span>(</span>
+<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a>        title_text <span class="op">=</span> <span class="st">&quot;Year&quot;</span></span>
+<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Bypass the strict Python validator by injecting the strings directly into the dictionary</span></span>
+<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a>fig_cum_time.layout.legend.itemclick <span class="op">=</span> <span class="st">&quot;toggle3&quot;</span></span>
+<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a>fig_cum_time.layout.legend.itemdoubleclick <span class="op">=</span> <span class="st">&quot;isolate3&quot;</span></span>
+<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-110"><a href="#cb5-110" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-111"><a href="#cb5-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a><span class="fu">### Why this works</span></span>
+<span id="cb5-113"><a href="#cb5-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-114"><a href="#cb5-114" aria-hidden="true" tabindex="-1"></a>By assigning them via <span class="in">`fig_cum_time.layout.legend.itemclick = &quot;toggle3&quot;`</span>, you sneak the values directly into the underlying figure dictionary. When Plotly exports the plot data to your browser, the Javascript side will receive <span class="in">`&quot;toggle3&quot;`</span> and <span class="in">`&quot;isolate3&quot;`</span>, recognize them perfectly, and isolate all of your subplots and markers across your entire figure on a double-click!</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

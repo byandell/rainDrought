@@ -165,8 +165,8 @@ fig_time.update_layout(
         dict(
             type="buttons",
             direction="right",
-            x=0,
-            y=1.08,
+            x=1,
+            y=0,
             xanchor="left",
             yanchor="bottom",
             showactive=False,
@@ -295,33 +295,34 @@ for year in years:
         row=3, col=1
     )
 
+
 fig_cum_time.update_layout(
-    height=880, 
-    template="plotly_white", 
-    title=dict(
-        text="Annual Progression of Cumulative Climate Metrics",
-        y=0.95,
-        x=0.5,
-        xanchor="center",
-        yanchor="top"
+    height = 880,
+    template = "plotly_white",
+    title = dict(
+        text = "Annual Progression of Cumulative Climate Metrics",
+        y = 0.95, x = 0.5, xanchor = "center", yanchor = "top"
     ),
-    margin=dict(t=90),
-    legend=dict(
-        groupclick="togglegroup",
-        title_text="Year"
+    margin = dict(t = 90),
+    legend = dict(
+        # groupclick="togglegroup",  <-- You can replace or keep this, but the below are safer for multi-subplots
+        # itemclick = "toggle3",         # Single-click toggles the entire group
+        # itemdoubleclick = "isolate3",  # Double-click isolates the entire group
+        groupclick="togglegroup",        # Natively validated to handle groups on double-click
+        title_text = "Year"
     ),
     updatemenus=[
         dict(
             type="buttons",
             direction="right",
-            x=0,
-            y=1.05,
+            x=1,
+            y=0,
             xanchor="left",
             yanchor="bottom",
             showactive=False,
             buttons=[
                 dict(
-                    label="Reset View (Show All)",
+                    label="Reset View",
                     method="update",
                     args=[
                         {"visible": [True] * len(fig_cum_time.data)},
@@ -337,6 +338,7 @@ fig_cum_time.update_layout(
         )
     ]
 )
+# Format the x-axes
 fig_cum_time.update_xaxes(tickformat="%b", dtick="M1")
 fig_cum_time.show()
 ```
@@ -463,22 +465,25 @@ fig_combined_annual.update_layout(
         yanchor="top"
     ),
     margin=dict(t=65),
-    legend=dict(
-        groupclick="togglegroup",
-        title_text="Year"
+    legend = dict(
+        # groupclick="togglegroup",  <-- You can replace or keep this, but the below are safer for multi-subplots
+        # itemclick = "toggle3",         # Single-click toggles the entire group
+        # itemdoubleclick = "isolate3",  # Double-click isolates the entire group
+        groupclick="togglegroup",        # Natively validated to handle groups on double-click
+        title_text = "Year"
     ),
     updatemenus=[
         dict(
             type="buttons",
             direction="right",
-            x=0,
-            y=1.08,
+            x=1,
+            y=0,
             xanchor="left",
             yanchor="bottom",
             showactive=False,
             buttons=[
                 dict(
-                    label="Reset View (Show All)",
+                    label="Reset View",
                     method="update",
                     args=[
                         {"visible": [True] * len(fig_combined_annual.data)},
@@ -494,6 +499,7 @@ fig_combined_annual.update_layout(
         )
     ]
 )
+# Format the x-axes
 fig_combined_annual.update_xaxes(title_text="Cumulative Precipitation (inches)")
 fig_combined_annual.update_yaxes(title_text="Cumulative DSCI", row=1, col=1)
 fig_combined_annual.show()

@@ -36,12 +36,14 @@ The project is structured as a multi-page Quarto website configured via **[_quar
   - Saves weekly drought records for Todd County to [todd_drought_weekly.csv](data/todd_drought_weekly.csv).
   - Saves daily statewide average precipitation records to [south_dakota_precipitation_daily.csv](data/south_dakota_precipitation_daily.csv).
   - Generates static 10-year climate visualizations inside the report.
-- **[plot_records.qmd](plot_records.qmd)**: A Quarto document utilizing **[Plotly](https://plotly.com/python/)** to build interactive, responsive visualizations. Code blocks are **hidden/folded by default** (`code-fold: true`) for a clean visual presentation, but can be expanded interactively.
+- **[plot_records.qmd](plot_records.qmd)**: A Quarto document utilizing **[Plotly](https://plotly.com/python/)** to build interactive, responsive visualizations. Code blocks are **hidden/folded by default** (`code-fold: true`) for a clean visual presentation, but can be expanded interactively. Double-click explicitly included in legend with `groupclick="togglegroup"`;
+allow `Reset View` with `buttons` update in lower right to re-render the plots from stored data.
   - **10-Year Timelines**: Plots weekly drought indices (DSCI) for both counties and the statewide rolling precipitation in a 3-panel layout.
   - **Time vs. Cumulative values**: Plots time within the year (standardized month, X-axis) vs. annual cumulative values (Y-axis) in a 3-panel layout with separate colored curves by year and month-end markers.
   - **Annual Cumulative Trajectories**: Plots annual cumulative rain vs. cumulative drought index (DSCI) for both counties as two facets side-by-side on the same plot surface, with separate colored curves by year and month-end markers. Features overlaid **DRY** (upper-left) and **WET** (lower-right) background watermark labels, group-toggled legends for isolating individual years, and a detailed interpretation guide.
 
 To build and compile the entire website, run:
+
 ```bash
 quarto render
 ```
@@ -49,6 +51,7 @@ quarto render
 ### 4. Deploying to GitHub Pages
 
 To publish the interactive site:
+
 1. Commit and push the repository, including the compiled `/docs` folder, to GitHub.
 2. Navigate to your repository page on GitHub.
 3. Select **Settings** -> **Pages** (under the "Code and automation" section).
