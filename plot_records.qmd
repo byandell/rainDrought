@@ -277,12 +277,12 @@ fig_cum_time.update_layout(
     template="plotly_white", 
     title=dict(
         text="Annual Progression of Cumulative Climate Metrics",
-        y=0.96,
+        y=0.95,
         x=0.5,
         xanchor="center",
         yanchor="top"
     ),
-    margin=dict(t=60),
+    margin=dict(t=90),
     legend=dict(
         groupclick="togglegroup",
         title_text="Year"
