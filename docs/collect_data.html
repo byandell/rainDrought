@@ -4884,7 +4884,7 @@ vertical-align: -.125em;
 <h1>Data Collection Pipeline</h1>
 <p>The following Python block dynamically computes the date range for the past 10 years and calls the respective APIs to fetch and store the records.</p>
 <div id="data-collection" class="cell" data-message="false" data-execution_count="1">
-<details open class="code-fold">
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> io</span>
@@ -4989,7 +4989,7 @@ Querying ACIS GridData API...
 <section id="u.s.-drought-monitor-data-summary-oglala-lakota-county" class="level2">
 <h2 class="anchored" data-anchor-id="u.s.-drought-monitor-data-summary-oglala-lakota-county">U.S. Drought Monitor Data Summary (Oglala Lakota County)</h2>
 <div id="cell-usdm-summary-oglala" class="cell" data-execution_count="2">
-<details open class="code-fold">
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df_usdm <span class="op">=</span> pd.read_csv(<span class="st">&quot;data/oglala_lakota_drought_weekly.csv&quot;</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -5087,7 +5087,7 @@ Querying ACIS GridData API...
 <section id="oglala-lakota-drought-summary-stats" class="level3">
 <h3 class="anchored" data-anchor-id="oglala-lakota-drought-summary-stats">Oglala Lakota Drought Summary Stats</h3>
 <div id="cell-usdm-stats-oglala" class="cell" data-execution_count="3">
-<details open class="code-fold">
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df_usdm[[<span class="st">&quot;None&quot;</span>, <span class="st">&quot;D0&quot;</span>, <span class="st">&quot;D1&quot;</span>, <span class="st">&quot;D2&quot;</span>, <span class="st">&quot;D3&quot;</span>, <span class="st">&quot;D4&quot;</span>]].describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -5191,7 +5191,7 @@ Querying ACIS GridData API...
 <section id="u.s.-drought-monitor-data-summary-todd-county" class="level2">
 <h2 class="anchored" data-anchor-id="u.s.-drought-monitor-data-summary-todd-county">U.S. Drought Monitor Data Summary (Todd County)</h2>
 <div id="cell-usdm-summary-todd" class="cell" data-execution_count="4">
-<details open class="code-fold">
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df_todd <span class="op">=</span> pd.read_csv(<span class="st">&quot;data/todd_drought_weekly.csv&quot;</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -5289,7 +5289,7 @@ Querying ACIS GridData API...
 <section id="todd-county-drought-summary-stats" class="level3">
 <h3 class="anchored" data-anchor-id="todd-county-drought-summary-stats">Todd County Drought Summary Stats</h3>
 <div id="cell-usdm-stats-todd" class="cell" data-execution_count="5">
-<details open class="code-fold">
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df_todd[[<span class="st">&quot;None&quot;</span>, <span class="st">&quot;D0&quot;</span>, <span class="st">&quot;D1&quot;</span>, <span class="st">&quot;D2&quot;</span>, <span class="st">&quot;D3&quot;</span>, <span class="st">&quot;D4&quot;</span>]].describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -5393,7 +5393,7 @@ Querying ACIS GridData API...
 <section id="daily-precipitation-data-summary" class="level2">
 <h2 class="anchored" data-anchor-id="daily-precipitation-data-summary">Daily Precipitation Data Summary</h2>
 <div id="cell-precip-summary" class="cell" data-execution_count="6">
-<details open class="code-fold">
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df_precip <span class="op">=</span> pd.read_csv(<span class="st">&quot;data/south_dakota_precipitation_daily.csv&quot;</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>df_precip[<span class="st">&quot;date&quot;</span>] <span class="op">=</span> pd.to_datetime(df_precip[<span class="st">&quot;date&quot;</span>])</span>
@@ -5452,7 +5452,7 @@ Querying ACIS GridData API...
 <section id="precipitation-summary-stats" class="level3">
 <h3 class="anchored" data-anchor-id="precipitation-summary-stats">Precipitation Summary Stats</h3>
 <div id="cell-precip-stats" class="cell" data-execution_count="7">
-<details open class="code-fold">
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>df_precip[<span class="st">&quot;precipitation_inches&quot;</span>].describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -5476,7 +5476,7 @@ Name: precipitation_inches, dtype: float64</code></pre>
 <h1>Visualizations</h1>
 <p>Let’s visualize the trends over the 10-year period.</p>
 <div id="cell-plots" class="cell" data-fig-height="9.5" data-fig-width="7.5" data-message="false" data-execution_count="8">
-<details open class="code-fold">
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
@@ -6016,7 +6016,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
 <span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co">    theme: cosmo</span></span>
 <span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: show</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: true</span></span>
 <span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
 <span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="co">    embed-resources: true</span></span>
 <span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>

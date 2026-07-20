@@ -7,7 +7,7 @@ format:
   html:
     theme: cosmo
     toc: true
-    code-fold: show
+    code-fold: true
     code-tools: true
     embed-resources: true
 ---
@@ -283,6 +283,14 @@ Finally, we plot **annual cumulative precipitation** (X-axis) against the **annu
 
 The curves for Oglala Lakota County and Todd County are displayed side-by-side as two facets on the same plot surface. Individual years are colored in a rainbow series with open circles marking the end of each month.
 
+### How to Interpret this Plot:
+- **X-Axis (Precipitation)**: Represents the total cumulative rain since January 1 of that year.
+- **Y-Axis (Drought DSCI)**: Represents the total cumulative weekly USDM DSCI since January 1 of that year.
+- **Watermarks (DRY / WET)**:
+  - **Upper-Left Corner ("DRY")**: High cumulative drought index but low rainfall. Curves that bend steeply upwards and stay to the left represent persistent, severe drought years.
+  - **Lower-Right Corner ("WET")**: High cumulative rainfall but low/no drought index. Curves that stretch far to the right and remain low represent wet, drought-free years.
+  - **Month Circles**: Progress from left to right chronologically (January to December), allowing you to trace the exact weeks when drought conditions escalated (steep slopes) or recovered (slopes flattening out as rainfall accumulated).
+
 ```{python}
 #| label: plot-combined-annual-trajectories
 #| warning: false
@@ -340,6 +348,43 @@ for year in years:
         ), 
         row=1, col=2
     )
+
+# Add background watermark text annotations for DRY and WET zones
+# Subplot 1 (Oglala Lakota County)
+fig_combined_annual.add_annotation(
+    xref="x domain", yref="y domain",
+    x=0.15, y=0.85,
+    text="<b>DRY</b>",
+    showarrow=False,
+    font=dict(size=40, color="rgba(150, 150, 150, 0.2)"),
+    textangle=-30
+)
+fig_combined_annual.add_annotation(
+    xref="x domain", yref="y domain",
+    x=0.85, y=0.15,
+    text="<b>WET</b>",
+    showarrow=False,
+    font=dict(size=40, color="rgba(150, 150, 150, 0.2)"),
+    textangle=-30
+)
+
+# Subplot 2 (Todd County)
+fig_combined_annual.add_annotation(
+    xref="x2 domain", yref="y2 domain",
+    x=0.15, y=0.85,
+    text="<b>DRY</b>",
+    showarrow=False,
+    font=dict(size=40, color="rgba(150, 150, 150, 0.2)"),
+    textangle=-30
+)
+fig_combined_annual.add_annotation(
+    xref="x2 domain", yref="y2 domain",
+    x=0.85, y=0.15,
+    text="<b>WET</b>",
+    showarrow=False,
+    font=dict(size=40, color="rgba(150, 150, 150, 0.2)"),
+    textangle=-30
+)
 
 fig_combined_annual.update_layout(
     height=450, 
