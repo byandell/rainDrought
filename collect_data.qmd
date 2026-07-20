@@ -15,11 +15,12 @@ format:
 # Introduction
 
 This document contains Python code to programmatically retrieve, process, and store 10 years of historical data for:
-1. **Weekly Drought Monitor records** for Oglala Lakota County, South Dakota (FIPS 46102).
+1. **Weekly Drought Monitor records** for Oglala Lakota County (FIPS 46102) and Todd County (FIPS 46121), South Dakota.
 2. **Daily Precipitation records** for the State of South Dakota (state-wide mean).
 
 The collected datasets are saved to the `data/` directory as:
 - `data/oglala_lakota_drought_weekly.csv`
+- `data/todd_drought_weekly.csv`
 - `data/south_dakota_precipitation_daily.csv`
 
 ---
@@ -73,24 +74,28 @@ end_date_str = today.strftime("%Y-%m-%d")
 
 print(f"Collection timeframe: {start_date_str} to {end_date_str}")
 
-# --- Task 1: Fetch U.S. Drought Monitor Data for Oglala Lakota County (FIPS 46102) ---
-fips_code = "46102"
-usdm_url = (
-    f"https://usdmdataservices.unl.edu/api/CountyStatistics/GetDroughtSeverityStatisticsByAreaPercent"
-    f"?aoi={fips_code}&startdate={start_date_str}&enddate={end_date_str}&statisticsType=1"
-)
+# --- Task 1: Fetch U.S. Drought Monitor Data for Counties ---
+counties = {
+    "46102": ("Oglala Lakota County", "oglala_lakota_drought_weekly.csv"),
+    "46121": ("Todd County", "todd_drought_weekly.csv")
+}
 
-print(f"Querying USDM API...")
-usdm_response = requests.get(usdm_url)
-if usdm_response.status_code == 200:
-    usdm_csv = usdm_response.text
-    usdm_path = os.path.join("data", "oglala_lakota_drought_weekly.csv")
-    with open(usdm_path, "w", encoding="utf-8") as f:
-        f.write(usdm_csv)
-    print(f"-> Successfully saved weekly drought data to {usdm_path}")
-else:
-    print(f"-> Error fetching USDM data: {usdm_response.status_code}")
-    print(usdm_response.text[:500])
+for fips_code, (county_name, filename) in counties.items():
+    usdm_url = (
+        f"https://usdmdataservices.unl.edu/api/CountyStatistics/GetDroughtSeverityStatisticsByAreaPercent"
+        f"?aoi={fips_code}&startdate={start_date_str}&enddate={end_date_str}&statisticsType=1"
+    )
+    print(f"Querying USDM API for {county_name}...")
+    usdm_response = requests.get(usdm_url)
+    if usdm_response.status_code == 200:
+        usdm_csv = usdm_response.text
+        usdm_path = os.path.join("data", filename)
+        with open(usdm_path, "w", encoding="utf-8") as f:
+            f.write(usdm_csv)
+        print(f"-> Successfully saved weekly drought data to {usdm_path}")
+    else:
+        print(f"-> Error fetching USDM data for {county_name}: {usdm_response.status_code}")
+        print(usdm_response.text[:500])
 
 # --- Task 2: Fetch Daily Precipitation Records for South Dakota (State Mean) ---
 acis_url = "https://data.rcc-acis.org/GridData"
@@ -139,10 +144,10 @@ else:
 
 Let's load the saved datasets to verify their content and print summary statistics.
 
-## U.S. Drought Monitor Data Summary
+## U.S. Drought Monitor Data Summary (Oglala Lakota County)
 
 ```{python}
-#| label: usdm-summary
+#| label: usdm-summary-oglala
 #| warning: false
 
 df_usdm = pd.read_csv("data/oglala_lakota_drought_weekly.csv")
@@ -152,15 +157,39 @@ df_usdm["ValidStart"] = pd.to_datetime(df_usdm["ValidStart"])
 df_usdm["ValidEnd"] = pd.to_datetime(df_usdm["ValidEnd"])
 df_usdm = df_usdm.sort_values("ValidStart").reset_index(drop=True)
 
-print(f"Number of weekly USDM records: {len(df_usdm)}")
+print(f"Oglala Lakota County weekly USDM records: {len(df_usdm)}")
 df_usdm[["ValidStart", "County", "None", "D0", "D1", "D2", "D3", "D4"]].tail()
 ```
 
-### Drought Summary Stats
+### Oglala Lakota Drought Summary Stats
 
 ```{python}
-#| label: usdm-stats
+#| label: usdm-stats-oglala
 df_usdm[["None", "D0", "D1", "D2", "D3", "D4"]].describe()
+```
+
+## U.S. Drought Monitor Data Summary (Todd County)
+
+```{python}
+#| label: usdm-summary-todd
+#| warning: false
+
+df_todd = pd.read_csv("data/todd_drought_weekly.csv")
+
+# Clean dates and sort chronologically
+df_todd["ValidStart"] = pd.to_datetime(df_todd["ValidStart"])
+df_todd["ValidEnd"] = pd.to_datetime(df_todd["ValidEnd"])
+df_todd = df_todd.sort_values("ValidStart").reset_index(drop=True)
+
+print(f"Todd County weekly USDM records: {len(df_todd)}")
+df_todd[["ValidStart", "County", "None", "D0", "D1", "D2", "D3", "D4"]].tail()
+```
+
+### Todd County Drought Summary Stats
+
+```{python}
+#| label: usdm-stats-todd
+df_todd[["None", "D0", "D1", "D2", "D3", "D4"]].describe()
 ```
 
 ## Daily Precipitation Data Summary
@@ -195,39 +224,47 @@ Let's visualize the trends over the 10-year period.
 #| warning: false
 #| message: false
 #| fig-width: 7.5
-#| fig-height: 6.5
+#| fig-height: 9.5
 
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-fig, axes = plt.subplots(2, 1, figsize=(7.5, 6.5), sharex=False)
+fig, axes = plt.subplots(3, 1, figsize=(7.5, 9.5), sharex=False)
 
-# 1. Plot Weekly Drought Monitor Trends (Cumulative Area Percentage)
-# D0: Abnormally Dry, D1: Moderate, D2: Severe, D3: Extreme, D4: Exceptional
+# 1. Plot Weekly Drought Monitor Trends (Oglala Lakota County)
 axes[0].fill_between(df_usdm["ValidStart"], df_usdm["D0"], color="#ffff00", alpha=0.5, label="D0 (Abnormally Dry)")
 axes[0].fill_between(df_usdm["ValidStart"], df_usdm["D1"], color="#fcd37f", alpha=0.6, label="D1 (Moderate Drought)")
 axes[0].fill_between(df_usdm["ValidStart"], df_usdm["D2"], color="#ffaa00", alpha=0.7, label="D2 (Severe Drought)")
 axes[0].fill_between(df_usdm["ValidStart"], df_usdm["D3"], color="#e60000", alpha=0.8, label="D3 (Extreme Drought)")
 axes[0].fill_between(df_usdm["ValidStart"], df_usdm["D4"], color="#730000", alpha=0.9, label="D4 (Exceptional Drought)")
-axes[0].set_title("Weekly Drought Monitor Area Severity (%) - Oglala Lakota County", fontsize=13, fontweight="bold")
-axes[0].set_ylabel("Cumulative % Area affected", fontsize=11)
+axes[0].set_title("Weekly Drought Monitor Area Severity (%) - Oglala Lakota County", fontsize=12, fontweight="bold")
+axes[0].set_ylabel("Cumulative % Area affected", fontsize=10)
 axes[0].set_ylim(0, 100)
-axes[0].legend(loc="upper right", frameon=True)
+axes[0].legend(loc="upper right", frameon=True, fontsize=8)
 
-# 2. Plot Monthly Aggregated Precipitation (for cleaner visualization)
+# 2. Plot Weekly Drought Monitor Trends (Todd County)
+axes[1].fill_between(df_todd["ValidStart"], df_todd["D0"], color="#ffff00", alpha=0.5, label="D0 (Abnormally Dry)")
+axes[1].fill_between(df_todd["ValidStart"], df_todd["D1"], color="#fcd37f", alpha=0.6, label="D1 (Moderate Drought)")
+axes[1].fill_between(df_todd["ValidStart"], df_todd["D2"], color="#ffaa00", alpha=0.7, label="D2 (Severe Drought)")
+axes[1].fill_between(df_todd["ValidStart"], df_todd["D3"], color="#e60000", alpha=0.8, label="D3 (Extreme Drought)")
+axes[1].fill_between(df_todd["ValidStart"], df_todd["D4"], color="#730000", alpha=0.9, label="D4 (Exceptional Drought)")
+axes[1].set_title("Weekly Drought Monitor Area Severity (%) - Todd County", fontsize=12, fontweight="bold")
+axes[1].set_ylabel("Cumulative % Area affected", fontsize=10)
+axes[1].set_ylim(0, 100)
+axes[1].legend(loc="upper right", frameon=True, fontsize=8)
+
+# 3. Plot Monthly Aggregated Precipitation (South Dakota Mean)
 df_precip["year_month"] = df_precip["date"].dt.to_period("M")
 df_monthly = df_precip.groupby("year_month")["precipitation_inches"].sum().reset_index()
 df_monthly["date_index"] = df_monthly["year_month"].dt.to_timestamp()
 
-axes[1].bar(df_monthly["date_index"], df_monthly["precipitation_inches"], width=25, color="#1f77b4", alpha=0.8)
-# Plot a 12-month rolling mean to show trends
+axes[2].bar(df_monthly["date_index"], df_monthly["precipitation_inches"], width=25, color="#1f77b4", alpha=0.8)
 df_monthly["rolling_mean"] = df_monthly["precipitation_inches"].rolling(12, center=True).mean()
-axes[1].plot(df_monthly["date_index"], df_monthly["rolling_mean"], color="#d62728", linewidth=2.5, label="12-Month Rolling Mean")
-
-axes[1].set_title("South Dakota Monthly Total Precipitation (Statewide Average)", fontsize=13, fontweight="bold")
-axes[1].set_ylabel("Precipitation (inches)", fontsize=11)
-axes[1].legend(loc="upper right", frameon=True)
+axes[2].plot(df_monthly["date_index"], df_monthly["rolling_mean"], color="#d62728", linewidth=2.5, label="12-Month Rolling Mean")
+axes[2].set_title("South Dakota Monthly Total Precipitation (Statewide Average)", fontsize=12, fontweight="bold")
+axes[2].set_ylabel("Precipitation (inches)", fontsize=10)
+axes[2].legend(loc="upper right", frameon=True, fontsize=8)
 
 plt.tight_layout()
 plt.show()

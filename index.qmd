@@ -1,0 +1,42 @@
+---
+title: "South Dakota Rain and Drought Dashboard"
+subtitle: "10-Year Climate Analysis for Oglala Lakota and Todd Counties"
+author: "Antigravity Coding Assistant"
+date: "2026-07-20"
+---
+
+# Project Overview
+
+Welcome to the **South Dakota Rain and Drought Analysis Project**. This project collects, aligns, and visualizes 10 years of daily precipitation records for the state of South Dakota and weekly U.S. Drought Monitor data for Oglala Lakota County and Todd County.
+
+> [!NOTE]
+> All visualizations are fully interactive. You can zoom, pan, hover to inspect raw coordinates, and click on years in the legend to toggle specific curves.
+
+---
+
+# Data Sources & Repositories
+
+We track precipitation and drought severity metrics through several authoritative repositories:
+
+### 1. Weekly & Monthly Drought Tracking
+- **County Conditions dashboards (Drought.gov)**:
+  - [Oglala Lakota County Conditions](https://www.drought.gov/states/south-dakota/county/oglala%20lakota)
+  - [Todd County Conditions](https://www.drought.gov/states/south-dakota/county/todd)
+  These dashboards aggregate weekly **U.S. Drought Monitor** updates (released every Thursday) alongside the **Standardized Precipitation Index (SPI)**, which measures objective departures from normal rainfall.
+- **[U.S. Drought Monitor (South Dakota)](https://droughtmonitor.unl.edu/CurrentMap/StateDroughtMonitor.aspx?SD)**: Tracks percentage area classifications (from D0 "Abnormally Dry" to D4 "Exceptional Drought") on a weekly basis across the state. Tabular data is filtered explicitly down to individual counties like Oglala Lakota (FIPS `46102`) and Todd (FIPS `46121`).
+
+### 2. Daily & Historical Precipitation Records
+- **[South Dakota Mesonet Archives](https://sdgrass.org/tools-for-drought-planning/)**: Operated by South Dakota State University, the Mesonet offers daily cumulative curves of precipitation plotted against 30-year climate normals.
+- **[South Dakota Drought Dashboard](https://toolkit.climate.gov/tool/south-dakota-drought-dashboard)**: Hosted via the U.S. Climate Resilience Toolkit, offering map-based regional tracking combining short-term 1–7 day precipitation forecasts with historical monthly monitoring.
+- **[NCEI County-Level Climate Data](https://data.pressconnects.com/weather-data/oglala-lakota-county/46102/2024-01-01/)**: Updates monthly precipitation, rainfall, and temperature data specifically mapped to counties like Oglala Lakota and Todd.
+
+---
+
+# Local Data Pipeline & Analysis
+
+The project is split into two primary components:
+
+1. **[Data Collection](collect_data.qmd)**: A Python-based Quarto pipeline that programmatically retrieves 10 years of weekly county drought data and daily South Dakota mean precipitation (via ACIS GridData and USDM API endpoints).
+   - Saved weekly drought records: `data/oglala_lakota_drought_weekly.csv` and `data/todd_drought_weekly.csv`.
+   - Saved daily precipitation records: `data/south_dakota_precipitation_daily.csv`.
+2. **[Interactive Visualizations](plot_records.qmd)**: A Plotly-based dashboard that builds timeline charts and cumulative trajectories over time and by year to compare county-specific drought progressions with precipitation.

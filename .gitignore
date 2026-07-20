@@ -30,3 +30,8 @@ ENV/
 .quarto/
 *.preview_html
 *.png
+
+/.quarto/
+
+# Quarto website assets (embedded in HTML files)
+docs/site_libs/

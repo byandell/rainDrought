@@ -1,0 +1,23 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "SD Rain & Drought Analysis"
+  navbar:
+    background: primary
+    left:
+      - text: "Overview"
+        href: index.qmd
+      - text: "Data Collection"
+        href: collect_data.qmd
+      - text: "Interactive Analysis"
+        href: plot_records.qmd
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-fold: show
+    code-tools: true
+    embed-resources: true
