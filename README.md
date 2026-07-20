@@ -9,10 +9,13 @@ It compiles into a fully interactive, self-contained multi-page website publishe
 ## Website Navigation
 
 The compiled website is located in the **[docs/](docs/)** folder and contains:
+
 - **[Overview (docs/index.html)](docs/index.html)**: Project overview, data sources, and links.
 - **[Data Collection (docs/collect_data.html)](docs/collect_data.html)**: Historical API download pipeline and documentation.
 - **[Interactive Analysis (docs/plot_records.html)](docs/plot_records.html)**: Interactive climate dashboards displaying faceted timelines, time-vs-cumulative metrics, and side-by-side annual trajectories.
 - **[AI Conversation Record (docs/chats.html)](docs/chats.html)**: A parsed log of project prompts, requirements, and results.
+
+*<https://byandell.github.io/rainDrought/>*
 
 ---
 
@@ -35,13 +38,17 @@ The compiled website is located in the **[docs/](docs/)** folder and contains:
 ## Getting Started
 
 ### 1. Build and Compile the Website
+
 To compile all `.qmd` pages into the self-contained static site inside `/docs`, run:
+
 ```bash
 quarto render
 ```
 
 ### 2. Run Data Updates
+
 To query the endpoints and refresh the local CSV files, render the collection pipeline:
+
 ```bash
 quarto render collect_data.qmd
 ```
