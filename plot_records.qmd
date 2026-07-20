@@ -152,7 +152,14 @@ fig_time.add_trace(
 fig_time.update_layout(
     height=650, 
     template="plotly_white", 
-    title_text="10-Year Climate Metrics Over Time", 
+    title=dict(
+        text="10-Year Climate Metrics Over Time",
+        y=0.98,
+        x=0.5,
+        xanchor="center",
+        yanchor="top"
+    ),
+    margin=dict(t=50),
     showlegend=False
 )
 fig_time.show()
@@ -218,7 +225,7 @@ for year in years:
         go.Scatter(
             x=df_pts_p["day_in_year"], y=df_pts_p["cumulative_rain_year"], 
             mode="markers", marker=dict(symbol="circle-open", size=5, color=year_colors[year], line=dict(width=1)), 
-            legendgroup=year, showlegend=False
+            name=year, legendgroup=year, showlegend=False
         ), 
         row=1, col=1
     )
@@ -231,7 +238,7 @@ for year in years:
         go.Scatter(
             x=df_y_o["day_in_year"], y=df_y_o["cumulative_dsci_year"], 
             mode="lines", line=dict(color=year_colors[year]), 
-            legendgroup=year, showlegend=False
+            name=year, legendgroup=year, showlegend=False
         ), 
         row=2, col=1
     )
@@ -239,7 +246,7 @@ for year in years:
         go.Scatter(
             x=df_pts_o["day_in_year"], y=df_pts_o["cumulative_dsci_year"], 
             mode="markers", marker=dict(symbol="circle-open", size=5, color=year_colors[year], line=dict(width=1)), 
-            legendgroup=year, showlegend=False
+            name=year, legendgroup=year, showlegend=False
         ), 
         row=2, col=1
     )
@@ -252,7 +259,7 @@ for year in years:
         go.Scatter(
             x=df_y_t["day_in_year"], y=df_y_t["cumulative_dsci_year"], 
             mode="lines", line=dict(color=year_colors[year]), 
-            legendgroup=year, showlegend=False
+            name=year, legendgroup=year, showlegend=False
         ), 
         row=3, col=1
     )
@@ -260,7 +267,7 @@ for year in years:
         go.Scatter(
             x=df_pts_t["day_in_year"], y=df_pts_t["cumulative_dsci_year"], 
             mode="markers", marker=dict(symbol="circle-open", size=5, color=year_colors[year], line=dict(width=1)), 
-            legendgroup=year, showlegend=False
+            name=year, legendgroup=year, showlegend=False
         ), 
         row=3, col=1
     )
@@ -270,12 +277,12 @@ fig_cum_time.update_layout(
     template="plotly_white", 
     title=dict(
         text="Annual Progression of Cumulative Climate Metrics",
-        y=0.98,
+        y=0.96,
         x=0.5,
         xanchor="center",
         yanchor="top"
     ),
-    margin=dict(t=80),
+    margin=dict(t=60),
     legend=dict(
         groupclick="togglegroup",
         title_text="Year"
@@ -333,7 +340,7 @@ for year in years:
         go.Scatter(
             x=df_pts_o["cumulative_rain_year"], y=df_pts_o["cumulative_dsci_year"], 
             mode="markers", marker=dict(symbol="circle-open", size=5, color=year_colors[year], line=dict(width=1)), 
-            legendgroup=year, showlegend=False
+            name=year, legendgroup=year, showlegend=False
         ), 
         row=1, col=1
     )
@@ -354,7 +361,7 @@ for year in years:
         go.Scatter(
             x=df_pts_t["cumulative_rain_year"], y=df_pts_t["cumulative_dsci_year"], 
             mode="markers", marker=dict(symbol="circle-open", size=5, color=year_colors[year], line=dict(width=1)), 
-            legendgroup=year, showlegend=False
+            name=year, legendgroup=year, showlegend=False
         ), 
         row=1, col=2
     )
@@ -401,12 +408,12 @@ fig_combined_annual.update_layout(
     template="plotly_white", 
     title=dict(
         text="Annual Cumulative Rain vs. Cumulative Drought Index (DSCI) Trajectories",
-        y=0.95,
+        y=0.94,
         x=0.5,
         xanchor="center",
         yanchor="top"
     ),
-    margin=dict(t=100),
+    margin=dict(t=65),
     legend=dict(
         groupclick="togglegroup",
         title_text="Year"

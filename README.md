@@ -12,6 +12,7 @@ The compiled website is located in the **[docs/](docs/)** folder and contains:
 - **[Overview (docs/index.html)](docs/index.html)**: Project overview, data sources, and links.
 - **[Data Collection (docs/collect_data.html)](docs/collect_data.html)**: Historical API download pipeline and documentation.
 - **[Interactive Analysis (docs/plot_records.html)](docs/plot_records.html)**: Interactive climate dashboards displaying faceted timelines, time-vs-cumulative metrics, and side-by-side annual trajectories.
+- **[AI Conversation Record (docs/chats.html)](docs/chats.html)**: A parsed log of project prompts, requirements, and results.
 
 ---
 
@@ -19,7 +20,8 @@ The compiled website is located in the **[docs/](docs/)** folder and contains:
 
 - **`_quarto.yml`**: Quarto website configuration file.
 - **`index.qmd`**: Welcome page of the Quarto website.
-- **[rainDrought.md](rainDrought.md)**: Repository overview documenting project requirements and authoritative data sources.
+- **[chats.md](chats.md)**: AI conversation record documenting prompt instructions, research, and project progress.
+- **[AGENTS.md](AGENTS.md)**: Style guide and repository context document designed to onboard and align AI coding agents on build steps, environments, and directories.
 - **`collect_data.qmd`**: Python script that queries the ACIS GridData and USDM APIs to download data.
 - **`plot_records.qmd`**: Python script that parses, merges, and visualizes the records using Plotly.
 - **`data/`**: Directory containing retrieved CSV files:
