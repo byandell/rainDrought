@@ -266,10 +266,20 @@ for year in years:
     )
 
 fig_cum_time.update_layout(
-    height=850, 
+    height=880, 
     template="plotly_white", 
-    title_text="Annual Progression of Cumulative Climate Metrics", 
-    legend_title_text="Year"
+    title=dict(
+        text="Annual Progression of Cumulative Climate Metrics",
+        y=0.98,
+        x=0.5,
+        xanchor="center",
+        yanchor="top"
+    ),
+    margin=dict(t=80),
+    legend=dict(
+        groupclick="togglegroup",
+        title_text="Year"
+    )
 )
 fig_cum_time.update_xaxes(tickformat="%b", dtick="M1")
 fig_cum_time.show()
@@ -387,10 +397,20 @@ fig_combined_annual.add_annotation(
 )
 
 fig_combined_annual.update_layout(
-    height=450, 
+    height=480, 
     template="plotly_white", 
-    title_text="Annual Cumulative Rain vs. Cumulative Drought Index (DSCI) Trajectories",
-    legend_title_text="Year"
+    title=dict(
+        text="Annual Cumulative Rain vs. Cumulative Drought Index (DSCI) Trajectories",
+        y=0.95,
+        x=0.5,
+        xanchor="center",
+        yanchor="top"
+    ),
+    margin=dict(t=100),
+    legend=dict(
+        groupclick="togglegroup",
+        title_text="Year"
+    )
 )
 fig_combined_annual.update_xaxes(title_text="Cumulative Precipitation (inches)")
 fig_combined_annual.update_yaxes(title_text="Cumulative DSCI", row=1, col=1)
