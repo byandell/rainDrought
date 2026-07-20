@@ -1,0 +1,234 @@
+---
+title: "Precipitation and Drought Records Collection"
+subtitle: "10-Year Historical Records for South Dakota and Oglala Lakota County"
+author: "Antigravity Coding Assistant"
+date: "2026-07-19"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-fold: show
+    code-tools: true
+    embed-resources: true
+---
+
+# Introduction
+
+This document contains Python code to programmatically retrieve, process, and store 10 years of historical data for:
+1. **Weekly Drought Monitor records** for Oglala Lakota County, South Dakota (FIPS 46102).
+2. **Daily Precipitation records** for the State of South Dakota (state-wide mean).
+
+The collected datasets are saved to the `data/` directory as:
+- `data/oglala_lakota_drought_weekly.csv`
+- `data/south_dakota_precipitation_daily.csv`
+
+---
+
+# Data Sources & Citations
+
+1. **U.S. Drought Monitor (USDM)**
+   - **Source**: National Drought Mitigation Center (NDMC), University of Nebraska-Lincoln, USDA, and NOAA.
+   - **Description**: Weekly reports of drought severity classifications (None, D0-D4) indicating the percentage of area affected.
+   - **Data Access**: Retrieved via the USDM REST Data Services API: `https://usdmdataservices.unl.edu/api/`.
+   - **Citation**:
+     > U.S. Drought Monitor. (2026). *U.S. Drought Monitor data archives*. National Drought Mitigation Center. Retrieved from https://droughtmonitor.unl.edu/
+
+2. **Applied Climate Information System (ACIS)**
+   - **Source**: NOAA Regional Climate Centers (RCCs).
+   - **Description**: Daily precipitation observations aggregated and interpolated across the state of South Dakota, computed as a statewide mean.
+   - **Data Access**: Retrieved via the ACIS GridData API: `https://data.rcc-acis.org/GridData`.
+   - **Citation**:
+     > Applied Climate Information System (ACIS). (2026). *Gridded Daily Precipitation (NRCC Interpolated Grid)*. NOAA Regional Climate Centers. Retrieved from https://www.rcc-acis.org/
+
+---
+
+# Data Collection Pipeline
+
+The following Python block dynamically computes the date range for the past 10 years and calls the respective APIs to fetch and store the records.
+
+```{python}
+#| label: data-collection
+#| warning: false
+#| message: false
+
+import os
+import io
+import datetime
+import requests
+import pandas as pd
+
+# Create target data directory
+os.makedirs("data", exist_ok=True)
+
+# Calculate dynamic dates for the past 10 years
+today = datetime.date.today()
+try:
+    start_date = today.replace(year=today.year - 10)
+except ValueError:
+    # Handle leap year edge case (Feb 29)
+    start_date = today.replace(year=today.year - 10, day=28)
+
+start_date_str = start_date.strftime("%Y-%m-%d")
+end_date_str = today.strftime("%Y-%m-%d")
+
+print(f"Collection timeframe: {start_date_str} to {end_date_str}")
+
+# --- Task 1: Fetch U.S. Drought Monitor Data for Oglala Lakota County (FIPS 46102) ---
+fips_code = "46102"
+usdm_url = (
+    f"https://usdmdataservices.unl.edu/api/CountyStatistics/GetDroughtSeverityStatisticsByAreaPercent"
+    f"?aoi={fips_code}&startdate={start_date_str}&enddate={end_date_str}&statisticsType=1"
+)
+
+print(f"Querying USDM API...")
+usdm_response = requests.get(usdm_url)
+if usdm_response.status_code == 200:
+    usdm_csv = usdm_response.text
+    usdm_path = os.path.join("data", "oglala_lakota_drought_weekly.csv")
+    with open(usdm_path, "w", encoding="utf-8") as f:
+        f.write(usdm_csv)
+    print(f"-> Successfully saved weekly drought data to {usdm_path}")
+else:
+    print(f"-> Error fetching USDM data: {usdm_response.status_code}")
+    print(usdm_response.text[:500])
+
+# --- Task 2: Fetch Daily Precipitation Records for South Dakota (State Mean) ---
+acis_url = "https://data.rcc-acis.org/GridData"
+acis_payload = {
+    "state": "sd",
+    "sdate": start_date_str,
+    "edate": end_date_str,
+    "grid": "1",
+    "elems": [{"name": "pcpn", "area_reduce": "state_mean"}]
+}
+
+print(f"Querying ACIS GridData API...")
+acis_response = requests.post(acis_url, json=acis_payload)
+if acis_response.status_code == 200:
+    acis_json = acis_response.json()
+    raw_records = acis_json.get("data", [])
+    
+    # Process the nested list format into a standard DataFrame
+    processed = []
+    for date_val, val_dict in raw_records:
+        val = val_dict.get("SD") if isinstance(val_dict, dict) else None
+        # Handle potential trace ('T') or missing ('M') string codes
+        if val is None or val in ["M", "M ", " M", ""]:
+            val_float = None
+        elif val == "T" or val == "T ":
+            val_float = 0.0001
+        else:
+            try:
+                val_float = float(val)
+            except ValueError:
+                val_float = None
+        processed.append({"date": date_val, "precipitation_inches": val_float})
+        
+    df_precip = pd.DataFrame(processed)
+    precip_path = os.path.join("data", "south_dakota_precipitation_daily.csv")
+    df_precip.to_csv(precip_path, index=False)
+    print(f"-> Successfully saved daily precipitation data to {precip_path}")
+else:
+    print(f"-> Error fetching ACIS data: {acis_response.status_code}")
+    print(acis_response.text[:500])
+```
+
+---
+
+# Data Previews & Summaries
+
+Let's load the saved datasets to verify their content and print summary statistics.
+
+## U.S. Drought Monitor Data Summary
+
+```{python}
+#| label: usdm-summary
+#| warning: false
+
+df_usdm = pd.read_csv("data/oglala_lakota_drought_weekly.csv")
+
+# Clean dates and sort chronologically
+df_usdm["ValidStart"] = pd.to_datetime(df_usdm["ValidStart"])
+df_usdm["ValidEnd"] = pd.to_datetime(df_usdm["ValidEnd"])
+df_usdm = df_usdm.sort_values("ValidStart").reset_index(drop=True)
+
+print(f"Number of weekly USDM records: {len(df_usdm)}")
+df_usdm[["ValidStart", "County", "None", "D0", "D1", "D2", "D3", "D4"]].tail()
+```
+
+### Drought Summary Stats
+
+```{python}
+#| label: usdm-stats
+df_usdm[["None", "D0", "D1", "D2", "D3", "D4"]].describe()
+```
+
+## Daily Precipitation Data Summary
+
+```{python}
+#| label: precip-summary
+#| warning: false
+
+df_precip = pd.read_csv("data/south_dakota_precipitation_daily.csv")
+df_precip["date"] = pd.to_datetime(df_precip["date"])
+df_precip = df_precip.sort_values("date").reset_index(drop=True)
+
+print(f"Number of daily precipitation records: {len(df_precip)}")
+df_precip.tail()
+```
+
+### Precipitation Summary Stats
+
+```{python}
+#| label: precip-stats
+df_precip["precipitation_inches"].describe()
+```
+
+---
+
+# Visualizations
+
+Let's visualize the trends over the 10-year period.
+
+```{python}
+#| label: plots
+#| warning: false
+#| message: false
+#| fig-width: 7.5
+#| fig-height: 6.5
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+fig, axes = plt.subplots(2, 1, figsize=(7.5, 6.5), sharex=False)
+
+# 1. Plot Weekly Drought Monitor Trends (Cumulative Area Percentage)
+# D0: Abnormally Dry, D1: Moderate, D2: Severe, D3: Extreme, D4: Exceptional
+axes[0].fill_between(df_usdm["ValidStart"], df_usdm["D0"], color="#ffff00", alpha=0.5, label="D0 (Abnormally Dry)")
+axes[0].fill_between(df_usdm["ValidStart"], df_usdm["D1"], color="#fcd37f", alpha=0.6, label="D1 (Moderate Drought)")
+axes[0].fill_between(df_usdm["ValidStart"], df_usdm["D2"], color="#ffaa00", alpha=0.7, label="D2 (Severe Drought)")
+axes[0].fill_between(df_usdm["ValidStart"], df_usdm["D3"], color="#e60000", alpha=0.8, label="D3 (Extreme Drought)")
+axes[0].fill_between(df_usdm["ValidStart"], df_usdm["D4"], color="#730000", alpha=0.9, label="D4 (Exceptional Drought)")
+axes[0].set_title("Weekly Drought Monitor Area Severity (%) - Oglala Lakota County", fontsize=13, fontweight="bold")
+axes[0].set_ylabel("Cumulative % Area affected", fontsize=11)
+axes[0].set_ylim(0, 100)
+axes[0].legend(loc="upper right", frameon=True)
+
+# 2. Plot Monthly Aggregated Precipitation (for cleaner visualization)
+df_precip["year_month"] = df_precip["date"].dt.to_period("M")
+df_monthly = df_precip.groupby("year_month")["precipitation_inches"].sum().reset_index()
+df_monthly["date_index"] = df_monthly["year_month"].dt.to_timestamp()
+
+axes[1].bar(df_monthly["date_index"], df_monthly["precipitation_inches"], width=25, color="#1f77b4", alpha=0.8)
+# Plot a 12-month rolling mean to show trends
+df_monthly["rolling_mean"] = df_monthly["precipitation_inches"].rolling(12, center=True).mean()
+axes[1].plot(df_monthly["date_index"], df_monthly["rolling_mean"], color="#d62728", linewidth=2.5, label="12-Month Rolling Mean")
+
+axes[1].set_title("South Dakota Monthly Total Precipitation (Statewide Average)", fontsize=13, fontweight="bold")
+axes[1].set_ylabel("Precipitation (inches)", fontsize=11)
+axes[1].legend(loc="upper right", frameon=True)
+
+plt.tight_layout()
+plt.show()
+```

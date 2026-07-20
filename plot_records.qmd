@@ -1,0 +1,208 @@
+---
+title: "Visualizing Climate Records using Plotnine"
+subtitle: "10-Year Drought and Precipitation Analysis for South Dakota and Oglala Lakota County"
+author: "Antigravity Coding Assistant"
+date: "2026-07-19"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-fold: show
+    code-tools: true
+    embed-resources: true
+---
+
+# Introduction
+
+In this document, we visualize the weekly drought records for Oglala Lakota County and the daily precipitation records for South Dakota using Python's **[plotnine](https://plotnine.org/)** library, which implements the Grammar of Graphics in Python.
+
+We will display:
+1. Both datasets plotted over time.
+2. A single plot showing the relationship between **cumulative precipitation (X-axis)** and **drought severity (Y-axis)**.
+
+---
+
+# Data Processing & Alignment
+
+First, we load the collected datasets, calculate the **Drought Severity and Coverage Index (DSCI)**, compute **cumulative precipitation**, and merge the tables on matching dates.
+
+- **DSCI Formula**: For cumulative USDM statistics, the index is calculated as `DSCI = D0 + D1 + D2 + D3 + D4` (range: 0 to 500).
+- **Date Matching**: We align the daily precipitation and weekly drought records on the weekly `ValidStart` date of each USDM report.
+
+```{python}
+#| label: data-preparation
+#| warning: false
+#| message: false
+
+import pandas as pd
+import numpy as np
+
+# Load local CSV files
+df_usdm = pd.read_csv("data/oglala_lakota_drought_weekly.csv")
+df_precip = pd.read_csv("data/south_dakota_precipitation_daily.csv")
+
+# Parse dates
+df_usdm["date"] = pd.to_datetime(df_usdm["ValidStart"])
+df_precip["date"] = pd.to_datetime(df_precip["date"])
+
+# Calculate Drought Severity & Coverage Index (DSCI)
+df_usdm["dsci"] = df_usdm["D0"] + df_usdm["D1"] + df_usdm["D2"] + df_usdm["D3"] + df_usdm["D4"]
+df_usdm["year"] = df_usdm["date"].dt.year
+df_usdm = df_usdm.sort_values("date")
+df_usdm["cumulative_dsci_year"] = df_usdm.groupby("year")["dsci"].cumsum()
+
+# Calculate cumulative precipitation (inches) since the start of the period
+df_precip = df_precip.sort_values("date").reset_index(drop=True)
+df_precip["cumulative_rain"] = df_precip["precipitation_inches"].cumsum()
+
+# Calculate annual cumulative precipitation within each year
+df_precip["year"] = df_precip["date"].dt.year
+df_precip["cumulative_rain_year"] = df_precip.groupby("year")["precipitation_inches"].cumsum()
+
+# Calculate 365-day rolling cumulative precipitation for physical context
+df_precip["rolling_365d_rain"] = df_precip["precipitation_inches"].rolling(window=365, min_periods=1).sum()
+
+# Merge weekly drought data and daily precipitation data on matching dates
+df_merged = pd.merge(
+    df_usdm[["date", "year", "dsci", "cumulative_dsci_year"]], 
+    df_precip[["date", "precipitation_inches", "cumulative_rain", "cumulative_rain_year", "rolling_365d_rain"]], 
+    on="date", 
+    how="inner"
+).sort_values("date").reset_index(drop=True)
+
+# Convert year to string category for discrete rainbow coloring
+df_merged["year_str"] = df_merged["year"].astype(str)
+
+df_merged.head()
+```
+
+---
+
+# Visualizations with Plotnine
+
+```{python}
+#| label: setup-plotnine
+from plotnine import *
+```
+
+## 1. Visualizing Data Over Time
+
+To view both datasets over the 10-year period, we melt the merged dataset and plot them using a faceted panel with independent vertical axes (`free_y`) to handle the different scales.
+
+```{python}
+#| label: plot-time-series
+#| warning: false
+#| message: false
+#| fig-width: 7.5
+#| fig-height: 5
+
+# Prepare data for faceting
+df_time = df_merged.melt(
+    id_vars=["date"], 
+    value_vars=["dsci", "rolling_365d_rain"], 
+    var_name="Metric", 
+    value_name="Value"
+)
+
+# Set descriptive facet labels
+labels = {
+    "dsci": "Drought Severity & Coverage Index (DSCI) [Oglala Lakota County]",
+    "rolling_365d_rain": "365-Day Rolling Precipitation (inches) [South Dakota Mean]"
+}
+df_time["Metric"] = df_time["Metric"].map(labels)
+
+p_time = (
+    ggplot(df_time, aes(x="date", y="Value", color="Metric"))
+    + geom_line(size=0.8)
+    + facet_wrap("~Metric", ncol=1, scales="free_y")
+    + scale_x_datetime(date_labels="%Y", date_breaks="1 year")
+    + scale_color_brewer(type="qual", palette="Set1")
+    + theme_minimal()
+    + theme(
+        legend_position="none",
+        figure_size=(7.5, 5),
+        strip_text=element_text(size=11, fontweight="bold"),
+        panel_grid_minor=element_blank()
+    )
+    + labs(
+        title="10-Year Climate Metrics Over Time",
+        x="Date",
+        y="Value"
+    )
+)
+
+p_time
+```
+
+---
+
+## 2. Cumulative Precipitation vs. Drought Index
+
+Next, we plot the **total accumulated precipitation** (since July 2016) on the X-axis against the **drought index (DSCI)** on the Y-axis. 
+
+A smoothing line (loess) is added to illustrate the relationship. Since cumulative precipitation grows monotonically with time, this plot tracks the trajectory of drought intensity as the region accumulated water over the decade.
+
+```{python}
+#| label: plot-cumulative-vs-drought
+#| warning: false
+#| message: false
+#| fig-width: 7.5
+#| fig-height: 4.5
+
+p_cumulative = (
+    ggplot(df_merged, aes(x="cumulative_rain", y="dsci"))
+    + geom_point(alpha=0.4, color="#1f77b4")
+    + geom_smooth(color="#d62728", size=1.2)
+    + theme_minimal()
+    + theme(
+        figure_size=(7.5, 4.5),
+        panel_grid_minor=element_blank()
+    )
+    + labs(
+        title="Cumulative Precipitation vs. Drought Severity Index (DSCI)",
+        subtitle="Oglala Lakota County Drought vs. South Dakota Cumulative Rain (10-Year Path)",
+        x="Total Cumulative Precipitation since July 2016 (inches)",
+        y="Drought Severity & Coverage Index (DSCI)"
+    )
+)
+
+p_cumulative
+```
+
+### 3. Annual Cumulative Precipitation vs. Cumulative Drought Index (by Year)
+
+Finally, we plot **annual cumulative precipitation** (X-axis) against the **annual cumulative drought index (DSCI)** (Y-axis) for each year. 
+To distinguish the years, the trajectories are split into separate curves and colored by year using a rainbow series.
+
+```{python}
+#| label: plot-annual-trajectories
+#| warning: false
+#| message: false
+#| fig-width: 7.5
+#| fig-height: 5.5
+
+# Identify the weekly record closest to the end of each month
+df_month_ends = df_merged.groupby(["year", df_merged["date"].dt.month]).tail(1)
+
+p_annual = (
+    ggplot(df_merged, aes(x="cumulative_rain_year", y="cumulative_dsci_year", color="year_str"))
+    + geom_path(size=1)
+    + geom_point(data=df_month_ends, shape="o", fill="none", size=1.5, stroke=0.8)
+    + scale_color_hue()
+    + theme_minimal()
+    + theme(
+        figure_size=(7.5, 5.5),
+        panel_grid_minor=element_blank(),
+        legend_position="right"
+    )
+    + labs(
+        title="Annual Cumulative Precipitation vs. Cumulative Drought Index",
+        subtitle="Comparing yearly trajectories (open circles mark month ends)",
+        x="Cumulative Precipitation within Year (inches)",
+        y="Cumulative Drought Severity and Coverage Index (DSCI)",
+        color="Year"
+    )
+)
+
+p_annual
+```
