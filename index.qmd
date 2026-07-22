@@ -8,6 +8,8 @@ date: "2026-07-20"
 # Project Overview
 
 Welcome to the **South Dakota Rain and Drought Analysis Project**. This project collects, aligns, and visualizes 10 years of daily precipitation records for the state of South Dakota and weekly U.S. Drought Monitor data for Oglala Lakota County and Todd County.
+These counties correspond to part of the Pine Ridge and Rosebud reservations
+and are labeled as such in plots.
 
 > [!NOTE]
 > All visualizations are fully interactive. You can zoom, pan, hover to inspect raw coordinates, and click on years in the legend to toggle specific curves.
