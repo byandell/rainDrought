@@ -1,6 +1,8 @@
 # SD Rain and Drought Analysis Project
 
 This repository programmatically collects, aligns, and visualizes 10 years of daily precipitation records for the state of South Dakota and weekly U.S. Drought Monitor (USDM) data for Oglala Lakota County (FIPS `46102`) and Todd County (FIPS `46121`).
+These counties correspond to part of the Pine Ridge and Rosebud reservations
+and are labeled as such in plots.
 
 It compiles into a fully interactive, self-contained multi-page website published via GitHub Pages.
 
