@@ -37,7 +37,7 @@ ENV/
 docs/site_libs/
 
 # Local custom region config
-/config.csv
+config.csv
 
 # Ignore custom data caches but keep the default ones
 /data/*.csv

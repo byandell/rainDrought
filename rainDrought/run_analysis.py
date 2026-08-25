@@ -14,9 +14,6 @@ import sys
 repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(repo_root)
 
-# Change directory to the repository root to resolve paths correctly
-os.chdir(repo_root)
-
 from rainDrought.config import get_config
 from rainDrought.data_pipeline import run_pipeline
 from rainDrought.visualizations import load_and_preprocess, plot_time_series, plot_time_vs_cumulative, plot_combined_annual_trajectories
