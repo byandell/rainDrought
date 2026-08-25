@@ -3,7 +3,7 @@ project:
   output-dir: docs
 
 website:
-  title: "SD Rain & Drought Analysis"
+  title: "Rain & Drought Analysis"
   navbar:
     background: primary
     left:
