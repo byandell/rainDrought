@@ -61,3 +61,39 @@ To publish the interactive site:
 5. Click **Save**.
 
 The interactive dashboards will be live shortly at `https://<your-username>.github.io/<your-repo-name>/`.
+
+---
+
+## August 2026 Updates: Refactoring, Dynamic Locations, and Standalone Scripting
+
+During this phase, the codebase was reorganized to support user-defined regions and clean up the visual presentation of code blocks on GitHub Pages:
+
+### 1. Dynamic Regional Configurations (`config.csv`)
+- **Schema & Defaults**: Introduced a configuration loader (`config.csv`) that dynamically overrides the default South Dakota dataset cache with user-specified states and counties (using FIPS codes).
+- **Template Layouts**: Included [`config.csv.default`](config.csv.default) for default South Dakota conditions and [`config.csv.example`](config.csv.example) showing a custom Nebraska/Lancaster County setup.
+- **Git Hygiene**: Updated [`.gitignore`](.gitignore) to exclude custom configuration settings and custom local cache files (`data/*.csv`) from Git tracking, ensuring the default South Dakota pages remain intact for the main web deployment.
+
+### 2. Modular Package Structure (`rainDrought/` Package)
+- Moved Python logic out of Quarto documents and into a structured package folder:
+  - [`config.py`](rainDrought/config.py): Dynamic county/state configuration parser.
+  - [`data_pipeline.py`](rainDrought/data_pipeline.py): REST API collection (USDM, ACIS GridData) and summary printing.
+  - [`visualizations.py`](rainDrought/visualizations.py): Math preprocessing, Matplotlib static charts, and interactive Plotly subplots.
+- Documented all modules and functions with PEP 257-compliant docstrings.
+- **Simplified Notebooks**: Refactored `collect_data.qmd` and `plot_records.qmd` to only contain imports and function calls, keeping published code blocks on GitHub Pages minimal, clean, and legible.
+
+### 3. Dynamic Visualizations & Summaries
+- **Flexible Subplots**: Matplotlib and Plotly figures now dynamically adjust subplot grids, titles, legend groups, height limits, and Reset View updates based on the count and labels of configured counties.
+- **Dynamic Text Elements**: Moved the Introduction sections below the config initialization cell and replaced static markdown text with dynamic `output: asis` code cells to print official state and county names dynamically.
+
+### 4. Standalone Runner Script
+- **[`rainDrought/run_analysis.py`](rainDrought/run_analysis.py)**: Added a command-line script to collect data, print statistics, export interactive Plotly charts as HTML files into the ignored `/output/` folder, and launch them in the browser. It runs relative to the active folder in which you run the shell command.
+
+### 5. Developer Onboarding & Documentation (`DEVELOPER.md`)
+- **[`DEVELOPER.md`](DEVELOPER.md)**: Created a comprehensive, root-level developer guide outlining:
+  - **Directory Architecture**: The mapping of Quarto pages (`index.qmd`, `collect_data.qmd`, `plot_records.qmd`) to self-contained HTML outputs in `/docs`.
+  - **Environment Setup**: Standardized usage of the `earth-analytics-python` Conda environment.
+  - **Data Endpoints**: Specs for the weekly USDM REST services and daily ACIS GridData APIs.
+  - **Data Standards**: Formula details for DSCI calculations ($\text{DSCI} = \sum \text{D}_i$) and daily trace precipitation mapping.
+  - **Visualization Controls**: Legend grouping (`groupclick="togglegroup"`) and zoom reset menu behaviors.
+  - **Deployment**: Local compilation instructions (`quarto render`) and GitHub Pages publication steps.
+
