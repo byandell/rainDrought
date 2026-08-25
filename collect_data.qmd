@@ -94,17 +94,17 @@ config = get_config()
 
 from IPython.display import display, Markdown
 
-county_bullets = "".join([f"1. **Weekly Drought Monitor records** for {c['name']} (FIPS {c['fips']}), {config['state_name']}.\n" for c in config["counties"]])
+county_bullets = "".join([f"**Weekly Drought Monitor records** for {c['name']} (FIPS {c['fips']}), {config['state_name']}.\n" for c in config["counties"]])
 
 display(Markdown(f"""
 # Introduction
 
 This document contains Python code to programmatically retrieve, process, and store 10-year historical climate records for:
 
-{county_bullets}
+1. {county_bullets}
 2. **Daily Precipitation records** for the State of {config['state_name']} (state-wide mean).
 
-The collected datasets are saved to the `data/` directory.
+The default datasets are saved to the [`data`](https://github.com/byandell/rainDrought/tree/main/data) directory.
 
 > [!NOTE]
 > **Active Region Configuration**: Default configured for **{config['state_name']}** (precipitation) and counties: {", ".join([f"{c['name']} ({c['label']})" for c in config['counties']])}.
