@@ -16,7 +16,8 @@ and are labeled as such in plots.
 
 - [Developer Guide](DEVELOPER.html)
 - [Agent Guide](AGENTS.html)
-- [Source](https://github.com/byandell/rainDrought)
+- [Source Code](https://github.com/byandell/rainDrought)
+  - [Python Code](https://github.com/byandell/rainDrought/tree/main/rainDrought)
 
 ---
 

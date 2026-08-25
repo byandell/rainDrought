@@ -17,72 +17,9 @@ format:
 #| warning: false
 #| message: false
 
-import os
-import pandas as pd
-
-# Create target data directory
-os.makedirs("data", exist_ok=True)
-
-# Helper to read configuration with defaults
-DEFAULT_STATE = "sd"
-DEFAULT_STATE_NAME = "South Dakota"
-DEFAULT_COUNTIES = [
-    {
-        "fips": "46102",
-        "name": "Oglala Lakota County",
-        "label": "Pine Ridge",
-        "filename": "oglala_lakota_drought_weekly.csv"
-    },
-    {
-        "fips": "46121",
-        "name": "Todd County",
-        "label": "Rosebud",
-        "filename": "todd_drought_weekly.csv"
-    }
-]
-DEFAULT_PRECIP_FILENAME = "south_dakota_precipitation_daily.csv"
-
-def get_config():
-    config = {
-        "state": DEFAULT_STATE,
-        "state_name": DEFAULT_STATE_NAME,
-        "counties": DEFAULT_COUNTIES,
-        "precip_filename": DEFAULT_PRECIP_FILENAME
-    }
-    config_path = "config.csv"
-    if os.path.exists(config_path):
-        try:
-            df_cfg = pd.read_csv(config_path)
-            # Parse state
-            df_state = df_cfg[df_cfg["type"].str.lower().str.strip() == "state"]
-            if not df_state.empty:
-                row = df_state.iloc[0]
-                config["state"] = str(row["code"]).strip().lower()
-                config["state_name"] = str(row["name"]).strip()
-                # Dynamic precip filename for custom state
-                config["precip_filename"] = f"{config['state_name'].lower().replace(' ', '_')}_precipitation_daily.csv"
-            
-            # Parse counties
-            df_counties = df_cfg[df_cfg["type"].str.lower().str.strip() == "county"]
-            if not df_counties.empty:
-                counties_list = []
-                for _, row in df_counties.iterrows():
-                    fips = str(row["code"]).strip()
-                    name = str(row["name"]).strip()
-                    label = str(row["label"]).strip() if pd.notna(row["label"]) and str(row["label"]).strip() != "" else name
-                    # Dynamic filename for custom county
-                    filename = f"{name.lower().replace(' ', '_').replace('.', '')}_drought_weekly.csv"
-                    counties_list.append({
-                        "fips": fips,
-                        "name": name,
-                        "label": label,
-                        "filename": filename
-                    })
-                config["counties"] = counties_list
-        except Exception as e:
-            print(f"Warning: Failed to load config.csv ({e}). Using defaults.")
-    return config
-
+import sys
+sys.path.append('.')
+from rainDrought.config import get_config
 config = get_config()
 ```
 
@@ -92,26 +29,9 @@ config = get_config()
 #| message: false
 #| output: asis
 
-from IPython.display import display, Markdown
-
-county_bullets = "".join([f"{c['name']} (FIPS {c['fips']}), " for c in config["counties"]])
-
-display(Markdown(f"""
-# Introduction
-
-This document contains Python code to programmatically retrieve, process, and store 10-year historical climate records for:
-
-1. **Weekly Drought Monitor records** for {county_bullets} {config['state_name']}.
-2. **Daily Precipitation records** for the state of {config['state_name']} (state-wide mean).
-
-The default datasets are saved to the [`data`](https://github.com/byandell/rainDrought/tree/main/data) directory.
-
-> [!NOTE]
-> **Active Region Configuration**: Default configured for **{config['state_name']}** (precipitation) and counties: {", ".join([f"{c['name']} ({c['label']})" for c in config['counties']])}.
-> To customize these locations, copy the layout from `config.csv.default` (or the example from `config.csv.example`) into a new `config.csv` file and re-run.
-"""))
+from rainDrought.visualizations import show_collect_data_intro
+show_collect_data_intro(config)
 ```
-
 
 ***
 
@@ -142,90 +62,8 @@ The following Python block dynamically computes the date range for the past 10 y
 #| warning: false
 #| message: false
 
-import datetime
-import requests
-
-print(f"Active State: {config['state_name']} ({config['state']})")
-print("Active Counties:")
-for county in config["counties"]:
-    print(f"  - {county['name']} (FIPS: {county['fips']}, Label: {county['label']})")
-
-
-# Calculate dynamic dates for the past 10 years
-today = datetime.date.today()
-try:
-    start_date = today.replace(year=today.year - 10)
-except ValueError:
-    # Handle leap year edge case (Feb 29)
-    start_date = today.replace(year=today.year - 10, day=28)
-
-start_date_str = start_date.strftime("%Y-%m-%d")
-end_date_str = today.strftime("%Y-%m-%d")
-
-print(f"\nCollection timeframe: {start_date_str} to {end_date_str}")
-
-# --- Task 1: Fetch U.S. Drought Monitor Data for Counties ---
-for county in config["counties"]:
-    fips_code = county["fips"]
-    county_name = county["name"]
-    filename = county["filename"]
-    
-    usdm_url = (
-        f"https://usdmdataservices.unl.edu/api/CountyStatistics/GetDroughtSeverityStatisticsByAreaPercent"
-        f"?aoi={fips_code}&startdate={start_date_str}&enddate={end_date_str}&statisticsType=1"
-    )
-    print(f"Querying USDM API for {county_name}...")
-    usdm_response = requests.get(usdm_url)
-    if usdm_response.status_code == 200:
-        usdm_csv = usdm_response.text
-        usdm_path = os.path.join("data", filename)
-        with open(usdm_path, "w", encoding="utf-8") as f:
-            f.write(usdm_csv)
-        print(f"-> Successfully saved weekly drought data to {usdm_path}")
-    else:
-        print(f"-> Error fetching USDM data for {county_name}: {usdm_response.status_code}")
-        print(usdm_response.text[:500])
-
-# --- Task 2: Fetch Daily Precipitation Records for State Mean ---
-acis_url = "https://data.rcc-acis.org/GridData"
-acis_payload = {
-    "state": config["state"],
-    "sdate": start_date_str,
-    "edate": end_date_str,
-    "grid": "1",
-    "elems": [{"name": "pcpn", "area_reduce": "state_mean"}]
-}
-
-print(f"Querying ACIS GridData API...")
-acis_response = requests.post(acis_url, json=acis_payload)
-if acis_response.status_code == 200:
-    acis_json = acis_response.json()
-    raw_records = acis_json.get("data", [])
-    
-    # Process the nested list format into a standard DataFrame
-    processed = []
-    state_key = config["state"].upper()
-    for date_val, val_dict in raw_records:
-        val = val_dict.get(state_key) if isinstance(val_dict, dict) else None
-        # Handle potential trace ('T') or missing ('M') string codes
-        if val is None or val in ["M", "M ", " M", ""]:
-            val_float = None
-        elif val == "T" or val == "T ":
-            val_float = 0.0001
-        else:
-            try:
-                val_float = float(val)
-            except ValueError:
-                val_float = None
-        processed.append({"date": date_val, "precipitation_inches": val_float})
-        
-    df_precip = pd.DataFrame(processed)
-    precip_path = os.path.join("data", config["precip_filename"])
-    df_precip.to_csv(precip_path, index=False)
-    print(f"-> Successfully saved daily precipitation data to {precip_path}")
-else:
-    print(f"-> Error fetching ACIS data: {acis_response.status_code}")
-    print(acis_response.text[:500])
+from rainDrought.data_pipeline import run_pipeline
+run_pipeline(config)
 ```
 
 ***
@@ -239,39 +77,8 @@ Let's load the saved datasets to verify their content and print summary statisti
 #| warning: false
 #| output: asis
 
-from IPython.display import display, Markdown
-
-for county in config["counties"]:
-    name = county["name"]
-    filename = county["filename"]
-    csv_path = os.path.join("data", filename)
-    
-    if os.path.exists(csv_path):
-        df_c = pd.read_csv(csv_path)
-        df_c["ValidStart"] = pd.to_datetime(df_c["ValidStart"])
-        df_c["ValidEnd"] = pd.to_datetime(df_c["ValidEnd"])
-        df_c = df_c.sort_values("ValidStart").reset_index(drop=True)
-        
-        display(Markdown(f"## U.S. Drought Monitor Data Summary ({name})"))
-        display(Markdown(f"**Weekly USDM records:** {len(df_c)}"))
-        display(df_c[["ValidStart", "County", "None", "D0", "D1", "D2", "D3", "D4"]].tail())
-        
-        display(Markdown(f"### {name} Drought Summary Stats"))
-        display(df_c[["None", "D0", "D1", "D2", "D3", "D4"]].describe())
-        display(Markdown("***"))
-
-precip_path = os.path.join("data", config["precip_filename"])
-if os.path.exists(precip_path):
-    df_precip = pd.read_csv(precip_path)
-    df_precip["date"] = pd.to_datetime(df_precip["date"])
-    df_precip = df_precip.sort_values("date").reset_index(drop=True)
-    
-    display(Markdown(f"## Daily Precipitation Data Summary ({config['state_name']})"))
-    display(Markdown(f"**Number of daily precipitation records:** {len(df_precip)}"))
-    display(df_precip.tail())
-    
-    display(Markdown(f"### Precipitation Summary Stats"))
-    display(df_precip["precipitation_inches"].describe())
+from rainDrought.data_pipeline import show_summaries
+show_summaries(config)
 ```
 
 ***
@@ -287,57 +94,6 @@ Let's visualize the trends over the 10-year period.
 #| fig-width: 7.5
 #| fig-height: 9.5
 
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
-
-sns.set_theme(style="whitegrid")
-num_counties = len(config["counties"])
-fig, axes = plt.subplots(num_counties + 1, 1, figsize=(7.5, 3.2 * (num_counties + 1)), sharex=False)
-
-# Standardize axes indexing if only 1 plot
-if num_counties + 1 == 1:
-    axes = [axes]
-elif not isinstance(axes, (list, np.ndarray)):
-    axes = [axes]
-
-for idx, county in enumerate(config["counties"]):
-    filename = county["filename"]
-    csv_path = os.path.join("data", filename)
-    if os.path.exists(csv_path):
-        df_c = pd.read_csv(csv_path)
-        df_c["ValidStart"] = pd.to_datetime(df_c["ValidStart"])
-        df_c = df_c.sort_values("ValidStart").reset_index(drop=True)
-        
-        ax = axes[idx]
-        ax.fill_between(df_c["ValidStart"], df_c["D0"], color="#ffff00", alpha=0.5, label="D0 (Abnormally Dry)")
-        ax.fill_between(df_c["ValidStart"], df_c["D1"], color="#fcd37f", alpha=0.6, label="D1 (Moderate Drought)")
-        ax.fill_between(df_c["ValidStart"], df_c["D2"], color="#ffaa00", alpha=0.7, label="D2 (Severe Drought)")
-        ax.fill_between(df_c["ValidStart"], df_c["D3"], color="#e60000", alpha=0.8, label="D3 (Extreme Drought)")
-        ax.fill_between(df_c["ValidStart"], df_c["D4"], color="#730000", alpha=0.9, label="D4 (Exceptional Drought)")
-        ax.set_title(f"Weekly Drought Monitor Area Severity (%) - {county['name']}", fontsize=11, fontweight="bold")
-        ax.set_ylabel("Cumulative % Area affected", fontsize=9)
-        ax.set_ylim(0, 100)
-        ax.legend(loc="upper right", frameon=True, fontsize=8)
-
-# Plot Monthly Aggregated Precipitation
-precip_path = os.path.join("data", config["precip_filename"])
-if os.path.exists(precip_path):
-    df_precip = pd.read_csv(precip_path)
-    df_precip["date"] = pd.to_datetime(df_precip["date"])
-    df_precip = df_precip.sort_values("date").reset_index(drop=True)
-    df_precip["year_month"] = df_precip["date"].dt.to_period("M")
-    df_monthly = df_precip.groupby("year_month")["precipitation_inches"].sum().reset_index()
-    df_monthly["date_index"] = df_monthly["year_month"].dt.to_timestamp()
-    
-    ax = axes[num_counties]
-    ax.bar(df_monthly["date_index"], df_monthly["precipitation_inches"], width=25, color="#1f77b4", alpha=0.8)
-    df_monthly["rolling_mean"] = df_monthly["precipitation_inches"].rolling(12, center=True).mean()
-    ax.plot(df_monthly["date_index"], df_monthly["rolling_mean"], color="#d62728", linewidth=2.2, label="12-Month Rolling Mean")
-    ax.set_title(f"{config['state_name']} Monthly Total Precipitation (Statewide Average)", fontsize=11, fontweight="bold")
-    ax.set_ylabel("Precipitation (inches)", fontsize=9)
-    ax.legend(loc="upper right", frameon=True, fontsize=8)
-
-plt.tight_layout()
-plt.show()
+from rainDrought.visualizations import plot_matplotlib_trends
+plot_matplotlib_trends(config)
 ```

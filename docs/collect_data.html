@@ -4842,105 +4842,25 @@ vertical-align: -.125em;
 <div id="config-init" class="cell" data-message="false" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create target data directory</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">&quot;data&quot;</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Helper to read configuration with defaults</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>DEFAULT_STATE <span class="op">=</span> <span class="st">&quot;sd&quot;</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>DEFAULT_STATE_NAME <span class="op">=</span> <span class="st">&quot;South Dakota&quot;</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>DEFAULT_COUNTIES <span class="op">=</span> [</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;fips&quot;</span>: <span class="st">&quot;46102&quot;</span>,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;name&quot;</span>: <span class="st">&quot;Oglala Lakota County&quot;</span>,</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;label&quot;</span>: <span class="st">&quot;Pine Ridge&quot;</span>,</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;filename&quot;</span>: <span class="st">&quot;oglala_lakota_drought_weekly.csv&quot;</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;fips&quot;</span>: <span class="st">&quot;46121&quot;</span>,</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;name&quot;</span>: <span class="st">&quot;Todd County&quot;</span>,</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;label&quot;</span>: <span class="st">&quot;Rosebud&quot;</span>,</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;filename&quot;</span>: <span class="st">&quot;todd_drought_weekly.csv&quot;</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>DEFAULT_PRECIP_FILENAME <span class="op">=</span> <span class="st">&quot;south_dakota_precipitation_daily.csv&quot;</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_config():</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    config <span class="op">=</span> {</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;state&quot;</span>: DEFAULT_STATE,</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;state_name&quot;</span>: DEFAULT_STATE_NAME,</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;counties&quot;</span>: DEFAULT_COUNTIES,</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;precip_filename&quot;</span>: DEFAULT_PRECIP_FILENAME</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    config_path <span class="op">=</span> <span class="st">&quot;config.csv&quot;</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> os.path.exists(config_path):</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>            df_cfg <span class="op">=</span> pd.read_csv(config_path)</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Parse state</span></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>            df_state <span class="op">=</span> df_cfg[df_cfg[<span class="st">&quot;type&quot;</span>].<span class="bu">str</span>.lower().<span class="bu">str</span>.strip() <span class="op">==</span> <span class="st">&quot;state&quot;</span>]</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="kw">not</span> df_state.empty:</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>                row <span class="op">=</span> df_state.iloc[<span class="dv">0</span>]</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>                config[<span class="st">&quot;state&quot;</span>] <span class="op">=</span> <span class="bu">str</span>(row[<span class="st">&quot;code&quot;</span>]).strip().lower()</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>                config[<span class="st">&quot;state_name&quot;</span>] <span class="op">=</span> <span class="bu">str</span>(row[<span class="st">&quot;name&quot;</span>]).strip()</span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>                <span class="co"># Dynamic precip filename for custom state</span></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>                config[<span class="st">&quot;precip_filename&quot;</span>] <span class="op">=</span> <span class="ss">f&quot;</span><span class="sc">{</span>config[<span class="st">&#39;state_name&#39;</span>]<span class="sc">.</span>lower()<span class="sc">.</span>replace(<span class="st">&#39; &#39;</span>, <span class="st">&#39;_&#39;</span>)<span class="sc">}</span><span class="ss">_precipitation_daily.csv&quot;</span></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Parse counties</span></span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>            df_counties <span class="op">=</span> df_cfg[df_cfg[<span class="st">&quot;type&quot;</span>].<span class="bu">str</span>.lower().<span class="bu">str</span>.strip() <span class="op">==</span> <span class="st">&quot;county&quot;</span>]</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="kw">not</span> df_counties.empty:</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>                counties_list <span class="op">=</span> []</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>                <span class="cf">for</span> _, row <span class="kw">in</span> df_counties.iterrows():</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>                    fips <span class="op">=</span> <span class="bu">str</span>(row[<span class="st">&quot;code&quot;</span>]).strip()</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>                    name <span class="op">=</span> <span class="bu">str</span>(row[<span class="st">&quot;name&quot;</span>]).strip()</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>                    label <span class="op">=</span> <span class="bu">str</span>(row[<span class="st">&quot;label&quot;</span>]).strip() <span class="cf">if</span> pd.notna(row[<span class="st">&quot;label&quot;</span>]) <span class="kw">and</span> <span class="bu">str</span>(row[<span class="st">&quot;label&quot;</span>]).strip() <span class="op">!=</span> <span class="st">&quot;&quot;</span> <span class="cf">else</span> name</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>                    <span class="co"># Dynamic filename for custom county</span></span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>                    filename <span class="op">=</span> <span class="ss">f&quot;</span><span class="sc">{</span>name<span class="sc">.</span>lower()<span class="sc">.</span>replace(<span class="st">&#39; &#39;</span>, <span class="st">&#39;_&#39;</span>)<span class="sc">.</span>replace(<span class="st">&#39;.&#39;</span>, <span class="st">&#39;&#39;</span>)<span class="sc">}</span><span class="ss">_drought_weekly.csv&quot;</span></span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>                    counties_list.append({</span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;fips&quot;</span>: fips,</span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;name&quot;</span>: name,</span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;label&quot;</span>: label,</span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;filename&quot;</span>: filename</span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>                    })</span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>                config[<span class="st">&quot;counties&quot;</span>] <span class="op">=</span> counties_list</span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f&quot;Warning: Failed to load config.csv (</span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">). Using defaults.&quot;</span>)</span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> config</span>
-<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> get_config()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>sys.path.append(<span class="st">&#39;.&#39;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rainDrought.config <span class="im">import</span> get_config</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> get_config()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div id="cell-introduction" class="cell" data-message="false" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> display, Markdown</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>county_bullets <span class="op">=</span> <span class="st">&quot;&quot;</span>.join([<span class="ss">f&quot;</span><span class="sc">{</span>c[<span class="st">&#39;name&#39;</span>]<span class="sc">}</span><span class="ss"> (FIPS </span><span class="sc">{</span>c[<span class="st">&#39;fips&#39;</span>]<span class="sc">}</span><span class="ss">), &quot;</span> <span class="cf">for</span> c <span class="kw">in</span> config[<span class="st">&quot;counties&quot;</span>]])</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>display(Markdown(<span class="ss">f&quot;&quot;&quot;</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ss"># Introduction</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ss">This document contains Python code to programmatically retrieve, process, and store 10-year historical climate records for:</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ss">1. **Weekly Drought Monitor records** for </span><span class="sc">{</span>county_bullets<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>config[<span class="st">&#39;state_name&#39;</span>]<span class="sc">}</span><span class="ss">.</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ss">2. **Daily Precipitation records** for the state of </span><span class="sc">{</span>config[<span class="st">&#39;state_name&#39;</span>]<span class="sc">}</span><span class="ss"> (state-wide mean).</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ss">The default datasets are saved to the [`data`](https://github.com/byandell/rainDrought/tree/main/data) directory.</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="ss">&gt; [!NOTE]</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="ss">&gt; **Active Region Configuration**: Default configured for **</span><span class="sc">{</span>config[<span class="st">&#39;state_name&#39;</span>]<span class="sc">}</span><span class="ss">** (precipitation) and counties: </span><span class="sc">{</span><span class="st">&quot;, &quot;</span><span class="sc">.</span>join([<span class="ss">f&quot;</span><span class="sc">{</span>c[<span class="st">&#39;name&#39;</span>]<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span>c[<span class="st">&#39;label&#39;</span>]<span class="sc">}</span><span class="ss">)&quot;</span> <span class="cf">for</span> c <span class="kw">in</span> config[<span class="st">&#39;counties&#39;</span>]])<span class="sc">}</span><span class="ss">.</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="ss">&gt; To customize these locations, copy the layout from `config.csv.default` (or the example from `config.csv.example`) into a new `config.csv` file and re-run.</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="ss">&quot;&quot;&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rainDrought.visualizations <span class="im">import</span> show_collect_data_intro</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>show_collect_data_intro(config)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
-<p>This document contains Python code to programmatically retrieve, process, and store 10-year historical climate records for:</p>
-<ol type="1">
-<li><strong>Weekly Drought Monitor records</strong> for Oglala Lakota County (FIPS 46102), Todd County (FIPS 46121), South Dakota.</li>
-<li><strong>Daily Precipitation records</strong> for the state of South Dakota (state-wide mean).</li>
+<p>This document contains Python code to programmatically retrieve, process, and store 10-year historical climate records for: 1. <strong>Weekly Drought Monitor records</strong> for Oglala Lakota County (FIPS 46102), South Dakota. 1. <strong>Weekly Drought Monitor records</strong> for Todd County (FIPS 46121), South Dakota.</p>
+<ol start="2" type="1">
+<li><strong>Daily Precipitation records</strong> for the State of South Dakota (state-wide mean).</li>
 </ol>
-<p>The default datasets are saved to the <a href="https://github.com/byandell/rainDrought/tree/main/data"><code>data</code></a> directory.</p>
+<p>The collected datasets are saved to the <code>data/</code> directory.</p>
 <blockquote class="blockquote">
 <p>[!NOTE] <strong>Active Region Configuration</strong>: Default configured for <strong>South Dakota</strong> (precipitation) and counties: Oglala Lakota County (Pine Ridge), Todd County (Rosebud). To customize these locations, copy the layout from <code>config.csv.default</code> (or the example from <code>config.csv.example</code>) into a new <code>config.csv</code> file and re-run.</p>
 </blockquote>
@@ -4973,90 +4893,8 @@ vertical-align: -.125em;
 <div id="data-collection" class="cell" data-message="false" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> datetime</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Active State: </span><span class="sc">{</span>config[<span class="st">&#39;state_name&#39;</span>]<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span>config[<span class="st">&#39;state&#39;</span>]<span class="sc">}</span><span class="ss">)&quot;</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Active Counties:&quot;</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> county <span class="kw">in</span> config[<span class="st">&quot;counties&quot;</span>]:</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;  - </span><span class="sc">{</span>county[<span class="st">&#39;name&#39;</span>]<span class="sc">}</span><span class="ss"> (FIPS: </span><span class="sc">{</span>county[<span class="st">&#39;fips&#39;</span>]<span class="sc">}</span><span class="ss">, Label: </span><span class="sc">{</span>county[<span class="st">&#39;label&#39;</span>]<span class="sc">}</span><span class="ss">)&quot;</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate dynamic dates for the past 10 years</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>today <span class="op">=</span> datetime.date.today()</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    start_date <span class="op">=</span> today.replace(year<span class="op">=</span>today.year <span class="op">-</span> <span class="dv">10</span>)</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">ValueError</span>:</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Handle leap year edge case (Feb 29)</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    start_date <span class="op">=</span> today.replace(year<span class="op">=</span>today.year <span class="op">-</span> <span class="dv">10</span>, day<span class="op">=</span><span class="dv">28</span>)</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>start_date_str <span class="op">=</span> start_date.strftime(<span class="st">&quot;%Y-%m-</span><span class="sc">%d</span><span class="st">&quot;</span>)</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>end_date_str <span class="op">=</span> today.strftime(<span class="st">&quot;%Y-%m-</span><span class="sc">%d</span><span class="st">&quot;</span>)</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="ch">\n</span><span class="ss">Collection timeframe: </span><span class="sc">{</span>start_date_str<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>end_date_str<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Task 1: Fetch U.S. Drought Monitor Data for Counties ---</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> county <span class="kw">in</span> config[<span class="st">&quot;counties&quot;</span>]:</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    fips_code <span class="op">=</span> county[<span class="st">&quot;fips&quot;</span>]</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    county_name <span class="op">=</span> county[<span class="st">&quot;name&quot;</span>]</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    filename <span class="op">=</span> county[<span class="st">&quot;filename&quot;</span>]</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    usdm_url <span class="op">=</span> (</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f&quot;https://usdmdataservices.unl.edu/api/CountyStatistics/GetDroughtSeverityStatisticsByAreaPercent&quot;</span></span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f&quot;?aoi=</span><span class="sc">{</span>fips_code<span class="sc">}</span><span class="ss">&amp;startdate=</span><span class="sc">{</span>start_date_str<span class="sc">}</span><span class="ss">&amp;enddate=</span><span class="sc">{</span>end_date_str<span class="sc">}</span><span class="ss">&amp;statisticsType=1&quot;</span></span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Querying USDM API for </span><span class="sc">{</span>county_name<span class="sc">}</span><span class="ss">...&quot;</span>)</span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    usdm_response <span class="op">=</span> requests.get(usdm_url)</span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> usdm_response.status_code <span class="op">==</span> <span class="dv">200</span>:</span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>        usdm_csv <span class="op">=</span> usdm_response.text</span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>        usdm_path <span class="op">=</span> os.path.join(<span class="st">&quot;data&quot;</span>, filename)</span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> <span class="bu">open</span>(usdm_path, <span class="st">&quot;w&quot;</span>, encoding<span class="op">=</span><span class="st">&quot;utf-8&quot;</span>) <span class="im">as</span> f:</span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>            f.write(usdm_csv)</span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;-&gt; Successfully saved weekly drought data to </span><span class="sc">{</span>usdm_path<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;-&gt; Error fetching USDM data for </span><span class="sc">{</span>county_name<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>usdm_response<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(usdm_response.text[:<span class="dv">500</span>])</span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Task 2: Fetch Daily Precipitation Records for State Mean ---</span></span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>acis_url <span class="op">=</span> <span class="st">&quot;https://data.rcc-acis.org/GridData&quot;</span></span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>acis_payload <span class="op">=</span> {</span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;state&quot;</span>: config[<span class="st">&quot;state&quot;</span>],</span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;sdate&quot;</span>: start_date_str,</span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;edate&quot;</span>: end_date_str,</span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;grid&quot;</span>: <span class="st">&quot;1&quot;</span>,</span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;elems&quot;</span>: [{<span class="st">&quot;name&quot;</span>: <span class="st">&quot;pcpn&quot;</span>, <span class="st">&quot;area_reduce&quot;</span>: <span class="st">&quot;state_mean&quot;</span>}]</span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Querying ACIS GridData API...&quot;</span>)</span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>acis_response <span class="op">=</span> requests.post(acis_url, json<span class="op">=</span>acis_payload)</span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> acis_response.status_code <span class="op">==</span> <span class="dv">200</span>:</span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>    acis_json <span class="op">=</span> acis_response.json()</span>
-<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>    raw_records <span class="op">=</span> acis_json.get(<span class="st">&quot;data&quot;</span>, [])</span>
-<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Process the nested list format into a standard DataFrame</span></span>
-<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>    processed <span class="op">=</span> []</span>
-<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>    state_key <span class="op">=</span> config[<span class="st">&quot;state&quot;</span>].upper()</span>
-<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> date_val, val_dict <span class="kw">in</span> raw_records:</span>
-<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>        val <span class="op">=</span> val_dict.get(state_key) <span class="cf">if</span> <span class="bu">isinstance</span>(val_dict, <span class="bu">dict</span>) <span class="cf">else</span> <span class="va">None</span></span>
-<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Handle potential trace (&#39;T&#39;) or missing (&#39;M&#39;) string codes</span></span>
-<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> val <span class="kw">is</span> <span class="va">None</span> <span class="kw">or</span> val <span class="kw">in</span> [<span class="st">&quot;M&quot;</span>, <span class="st">&quot;M &quot;</span>, <span class="st">&quot; M&quot;</span>, <span class="st">&quot;&quot;</span>]:</span>
-<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>            val_float <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> val <span class="op">==</span> <span class="st">&quot;T&quot;</span> <span class="kw">or</span> val <span class="op">==</span> <span class="st">&quot;T &quot;</span>:</span>
-<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>            val_float <span class="op">=</span> <span class="fl">0.0001</span></span>
-<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>            <span class="cf">try</span>:</span>
-<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>                val_float <span class="op">=</span> <span class="bu">float</span>(val)</span>
-<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>            <span class="cf">except</span> <span class="pp">ValueError</span>:</span>
-<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>                val_float <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>        processed.append({<span class="st">&quot;date&quot;</span>: date_val, <span class="st">&quot;precipitation_inches&quot;</span>: val_float})</span>
-<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>    df_precip <span class="op">=</span> pd.DataFrame(processed)</span>
-<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>    precip_path <span class="op">=</span> os.path.join(<span class="st">&quot;data&quot;</span>, config[<span class="st">&quot;precip_filename&quot;</span>])</span>
-<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>    df_precip.to_csv(precip_path, index<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;-&gt; Successfully saved daily precipitation data to </span><span class="sc">{</span>precip_path<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;-&gt; Error fetching ACIS data: </span><span class="sc">{</span>acis_response<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(acis_response.text[:<span class="dv">500</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rainDrought.data_pipeline <span class="im">import</span> run_pipeline</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>run_pipeline(config)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Active State: South Dakota (sd)
@@ -5064,7 +4902,7 @@ Active Counties:
   - Oglala Lakota County (FIPS: 46102, Label: Pine Ridge)
   - Todd County (FIPS: 46121, Label: Rosebud)
 
-Collection timeframe: 2016-08-25 to 2026-08-25
+Timeframe: 2016-08-25 to 2026-08-25
 Querying USDM API for Oglala Lakota County...
 -&gt; Successfully saved weekly drought data to data/oglala_lakota_drought_weekly.csv
 Querying USDM API for Todd County...
@@ -5081,39 +4919,8 @@ Querying ACIS GridData API...
 <div id="usdm-summaries" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> display, Markdown</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> county <span class="kw">in</span> config[<span class="st">&quot;counties&quot;</span>]:</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> county[<span class="st">&quot;name&quot;</span>]</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    filename <span class="op">=</span> county[<span class="st">&quot;filename&quot;</span>]</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    csv_path <span class="op">=</span> os.path.join(<span class="st">&quot;data&quot;</span>, filename)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> os.path.exists(csv_path):</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        df_c <span class="op">=</span> pd.read_csv(csv_path)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        df_c[<span class="st">&quot;ValidStart&quot;</span>] <span class="op">=</span> pd.to_datetime(df_c[<span class="st">&quot;ValidStart&quot;</span>])</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        df_c[<span class="st">&quot;ValidEnd&quot;</span>] <span class="op">=</span> pd.to_datetime(df_c[<span class="st">&quot;ValidEnd&quot;</span>])</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        df_c <span class="op">=</span> df_c.sort_values(<span class="st">&quot;ValidStart&quot;</span>).reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        display(Markdown(<span class="ss">f&quot;## U.S. Drought Monitor Data Summary (</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">)&quot;</span>))</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        display(Markdown(<span class="ss">f&quot;**Weekly USDM records:** </span><span class="sc">{</span><span class="bu">len</span>(df_c)<span class="sc">}</span><span class="ss">&quot;</span>))</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        display(df_c[[<span class="st">&quot;ValidStart&quot;</span>, <span class="st">&quot;County&quot;</span>, <span class="st">&quot;None&quot;</span>, <span class="st">&quot;D0&quot;</span>, <span class="st">&quot;D1&quot;</span>, <span class="st">&quot;D2&quot;</span>, <span class="st">&quot;D3&quot;</span>, <span class="st">&quot;D4&quot;</span>]].tail())</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>        display(Markdown(<span class="ss">f&quot;### </span><span class="sc">{</span>name<span class="sc">}</span><span class="ss"> Drought Summary Stats&quot;</span>))</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>        display(df_c[[<span class="st">&quot;None&quot;</span>, <span class="st">&quot;D0&quot;</span>, <span class="st">&quot;D1&quot;</span>, <span class="st">&quot;D2&quot;</span>, <span class="st">&quot;D3&quot;</span>, <span class="st">&quot;D4&quot;</span>]].describe())</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        display(Markdown(<span class="st">&quot;***&quot;</span>))</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>precip_path <span class="op">=</span> os.path.join(<span class="st">&quot;data&quot;</span>, config[<span class="st">&quot;precip_filename&quot;</span>])</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.path.exists(precip_path):</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    df_precip <span class="op">=</span> pd.read_csv(precip_path)</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    df_precip[<span class="st">&quot;date&quot;</span>] <span class="op">=</span> pd.to_datetime(df_precip[<span class="st">&quot;date&quot;</span>])</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    df_precip <span class="op">=</span> df_precip.sort_values(<span class="st">&quot;date&quot;</span>).reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    display(Markdown(<span class="ss">f&quot;## Daily Precipitation Data Summary (</span><span class="sc">{</span>config[<span class="st">&#39;state_name&#39;</span>]<span class="sc">}</span><span class="ss">)&quot;</span>))</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    display(Markdown(<span class="ss">f&quot;**Number of daily precipitation records:** </span><span class="sc">{</span><span class="bu">len</span>(df_precip)<span class="sc">}</span><span class="ss">&quot;</span>))</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    display(df_precip.tail())</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    display(Markdown(<span class="ss">f&quot;### Precipitation Summary Stats&quot;</span>))</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    display(df_precip[<span class="st">&quot;precipitation_inches&quot;</span>].describe())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rainDrought.data_pipeline <span class="im">import</span> show_summaries</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>show_summaries(config)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <section id="u.s.-drought-monitor-data-summary-oglala-lakota-county" class="level2">
 <h2 class="anchored" data-anchor-id="u.s.-drought-monitor-data-summary-oglala-lakota-county">U.S. Drought Monitor Data Summary (Oglala Lakota County)</h2>
@@ -5535,59 +5342,8 @@ Name: precipitation_inches, dtype: float64</code></pre>
 <div id="cell-plots" class="cell" data-fig-height="9.5" data-fig-width="7.5" data-message="false" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>sns.set_theme(style<span class="op">=</span><span class="st">&quot;whitegrid&quot;</span>)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>num_counties <span class="op">=</span> <span class="bu">len</span>(config[<span class="st">&quot;counties&quot;</span>])</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(num_counties <span class="op">+</span> <span class="dv">1</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="fl">7.5</span>, <span class="fl">3.2</span> <span class="op">*</span> (num_counties <span class="op">+</span> <span class="dv">1</span>)), sharex<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Standardize axes indexing if only 1 plot</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> num_counties <span class="op">+</span> <span class="dv">1</span> <span class="op">==</span> <span class="dv">1</span>:</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    axes <span class="op">=</span> [axes]</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="cf">elif</span> <span class="kw">not</span> <span class="bu">isinstance</span>(axes, (<span class="bu">list</span>, np.ndarray)):</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    axes <span class="op">=</span> [axes]</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> idx, county <span class="kw">in</span> <span class="bu">enumerate</span>(config[<span class="st">&quot;counties&quot;</span>]):</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    filename <span class="op">=</span> county[<span class="st">&quot;filename&quot;</span>]</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    csv_path <span class="op">=</span> os.path.join(<span class="st">&quot;data&quot;</span>, filename)</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> os.path.exists(csv_path):</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>        df_c <span class="op">=</span> pd.read_csv(csv_path)</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>        df_c[<span class="st">&quot;ValidStart&quot;</span>] <span class="op">=</span> pd.to_datetime(df_c[<span class="st">&quot;ValidStart&quot;</span>])</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>        df_c <span class="op">=</span> df_c.sort_values(<span class="st">&quot;ValidStart&quot;</span>).reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>        ax <span class="op">=</span> axes[idx]</span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>        ax.fill_between(df_c[<span class="st">&quot;ValidStart&quot;</span>], df_c[<span class="st">&quot;D0&quot;</span>], color<span class="op">=</span><span class="st">&quot;#ffff00&quot;</span>, alpha<span class="op">=</span><span class="fl">0.5</span>, label<span class="op">=</span><span class="st">&quot;D0 (Abnormally Dry)&quot;</span>)</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>        ax.fill_between(df_c[<span class="st">&quot;ValidStart&quot;</span>], df_c[<span class="st">&quot;D1&quot;</span>], color<span class="op">=</span><span class="st">&quot;#fcd37f&quot;</span>, alpha<span class="op">=</span><span class="fl">0.6</span>, label<span class="op">=</span><span class="st">&quot;D1 (Moderate Drought)&quot;</span>)</span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>        ax.fill_between(df_c[<span class="st">&quot;ValidStart&quot;</span>], df_c[<span class="st">&quot;D2&quot;</span>], color<span class="op">=</span><span class="st">&quot;#ffaa00&quot;</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, label<span class="op">=</span><span class="st">&quot;D2 (Severe Drought)&quot;</span>)</span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>        ax.fill_between(df_c[<span class="st">&quot;ValidStart&quot;</span>], df_c[<span class="st">&quot;D3&quot;</span>], color<span class="op">=</span><span class="st">&quot;#e60000&quot;</span>, alpha<span class="op">=</span><span class="fl">0.8</span>, label<span class="op">=</span><span class="st">&quot;D3 (Extreme Drought)&quot;</span>)</span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>        ax.fill_between(df_c[<span class="st">&quot;ValidStart&quot;</span>], df_c[<span class="st">&quot;D4&quot;</span>], color<span class="op">=</span><span class="st">&quot;#730000&quot;</span>, alpha<span class="op">=</span><span class="fl">0.9</span>, label<span class="op">=</span><span class="st">&quot;D4 (Exceptional Drought)&quot;</span>)</span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>        ax.set_title(<span class="ss">f&quot;Weekly Drought Monitor Area Severity (%) - </span><span class="sc">{</span>county[<span class="st">&#39;name&#39;</span>]<span class="sc">}</span><span class="ss">&quot;</span>, fontsize<span class="op">=</span><span class="dv">11</span>, fontweight<span class="op">=</span><span class="st">&quot;bold&quot;</span>)</span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>        ax.set_ylabel(<span class="st">&quot;Cumulative % Area affected&quot;</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>        ax.set_ylim(<span class="dv">0</span>, <span class="dv">100</span>)</span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>        ax.legend(loc<span class="op">=</span><span class="st">&quot;upper right&quot;</span>, frameon<span class="op">=</span><span class="va">True</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Monthly Aggregated Precipitation</span></span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>precip_path <span class="op">=</span> os.path.join(<span class="st">&quot;data&quot;</span>, config[<span class="st">&quot;precip_filename&quot;</span>])</span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.path.exists(precip_path):</span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>    df_precip <span class="op">=</span> pd.read_csv(precip_path)</span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>    df_precip[<span class="st">&quot;date&quot;</span>] <span class="op">=</span> pd.to_datetime(df_precip[<span class="st">&quot;date&quot;</span>])</span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>    df_precip <span class="op">=</span> df_precip.sort_values(<span class="st">&quot;date&quot;</span>).reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>    df_precip[<span class="st">&quot;year_month&quot;</span>] <span class="op">=</span> df_precip[<span class="st">&quot;date&quot;</span>].dt.to_period(<span class="st">&quot;M&quot;</span>)</span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>    df_monthly <span class="op">=</span> df_precip.groupby(<span class="st">&quot;year_month&quot;</span>)[<span class="st">&quot;precipitation_inches&quot;</span>].<span class="bu">sum</span>().reset_index()</span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>    df_monthly[<span class="st">&quot;date_index&quot;</span>] <span class="op">=</span> df_monthly[<span class="st">&quot;year_month&quot;</span>].dt.to_timestamp()</span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>    ax <span class="op">=</span> axes[num_counties]</span>
-<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>    ax.bar(df_monthly[<span class="st">&quot;date_index&quot;</span>], df_monthly[<span class="st">&quot;precipitation_inches&quot;</span>], width<span class="op">=</span><span class="dv">25</span>, color<span class="op">=</span><span class="st">&quot;#1f77b4&quot;</span>, alpha<span class="op">=</span><span class="fl">0.8</span>)</span>
-<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>    df_monthly[<span class="st">&quot;rolling_mean&quot;</span>] <span class="op">=</span> df_monthly[<span class="st">&quot;precipitation_inches&quot;</span>].rolling(<span class="dv">12</span>, center<span class="op">=</span><span class="va">True</span>).mean()</span>
-<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>    ax.plot(df_monthly[<span class="st">&quot;date_index&quot;</span>], df_monthly[<span class="st">&quot;rolling_mean&quot;</span>], color<span class="op">=</span><span class="st">&quot;#d62728&quot;</span>, linewidth<span class="op">=</span><span class="fl">2.2</span>, label<span class="op">=</span><span class="st">&quot;12-Month Rolling Mean&quot;</span>)</span>
-<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f&quot;</span><span class="sc">{</span>config[<span class="st">&#39;state_name&#39;</span>]<span class="sc">}</span><span class="ss"> Monthly Total Precipitation (Statewide Average)&quot;</span>, fontsize<span class="op">=</span><span class="dv">11</span>, fontweight<span class="op">=</span><span class="st">&quot;bold&quot;</span>)</span>
-<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">&quot;Precipitation (inches)&quot;</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
-<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>    ax.legend(loc<span class="op">=</span><span class="st">&quot;upper right&quot;</span>, frameon<span class="op">=</span><span class="va">True</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
-<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rainDrought.visualizations <span class="im">import</span> plot_matplotlib_trends</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>plot_matplotlib_trends(config)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -6094,330 +5850,86 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
 <span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
 <span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Create target data directory</span></span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>os.makedirs(<span class="st">&quot;data&quot;</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>sys.path.append(<span class="st">&#39;.&#39;</span>)</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rainDrought.config <span class="im">import</span> get_config</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> get_config()</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Helper to read configuration with defaults</span></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>DEFAULT_STATE <span class="op">=</span> <span class="st">&quot;sd&quot;</span></span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>DEFAULT_STATE_NAME <span class="op">=</span> <span class="st">&quot;South Dakota&quot;</span></span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>DEFAULT_COUNTIES <span class="op">=</span> [</span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;fips&quot;</span>: <span class="st">&quot;46102&quot;</span>,</span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;name&quot;</span>: <span class="st">&quot;Oglala Lakota County&quot;</span>,</span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;label&quot;</span>: <span class="st">&quot;Pine Ridge&quot;</span>,</span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;filename&quot;</span>: <span class="st">&quot;oglala_lakota_drought_weekly.csv&quot;</span></span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;fips&quot;</span>: <span class="st">&quot;46121&quot;</span>,</span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;name&quot;</span>: <span class="st">&quot;Todd County&quot;</span>,</span>
-<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;label&quot;</span>: <span class="st">&quot;Rosebud&quot;</span>,</span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;filename&quot;</span>: <span class="st">&quot;todd_drought_weekly.csv&quot;</span></span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>DEFAULT_PRECIP_FILENAME <span class="op">=</span> <span class="st">&quot;south_dakota_precipitation_daily.csv&quot;</span></span>
-<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_config():</span>
-<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>    config <span class="op">=</span> {</span>
-<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;state&quot;</span>: DEFAULT_STATE,</span>
-<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;state_name&quot;</span>: DEFAULT_STATE_NAME,</span>
-<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;counties&quot;</span>: DEFAULT_COUNTIES,</span>
-<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;precip_filename&quot;</span>: DEFAULT_PRECIP_FILENAME</span>
-<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>    config_path <span class="op">=</span> <span class="st">&quot;config.csv&quot;</span></span>
-<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> os.path.exists(config_path):</span>
-<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
-<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>            df_cfg <span class="op">=</span> pd.read_csv(config_path)</span>
-<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Parse state</span></span>
-<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>            df_state <span class="op">=</span> df_cfg[df_cfg[<span class="st">&quot;type&quot;</span>].<span class="bu">str</span>.lower().<span class="bu">str</span>.strip() <span class="op">==</span> <span class="st">&quot;state&quot;</span>]</span>
-<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="kw">not</span> df_state.empty:</span>
-<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>                row <span class="op">=</span> df_state.iloc[<span class="dv">0</span>]</span>
-<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>                config[<span class="st">&quot;state&quot;</span>] <span class="op">=</span> <span class="bu">str</span>(row[<span class="st">&quot;code&quot;</span>]).strip().lower()</span>
-<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>                config[<span class="st">&quot;state_name&quot;</span>] <span class="op">=</span> <span class="bu">str</span>(row[<span class="st">&quot;name&quot;</span>]).strip()</span>
-<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>                <span class="co"># Dynamic precip filename for custom state</span></span>
-<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a>                config[<span class="st">&quot;precip_filename&quot;</span>] <span class="op">=</span> <span class="ss">f&quot;</span><span class="sc">{</span>config[<span class="st">&#39;state_name&#39;</span>]<span class="sc">.</span>lower()<span class="sc">.</span>replace(<span class="st">&#39; &#39;</span>, <span class="st">&#39;_&#39;</span>)<span class="sc">}</span><span class="ss">_precipitation_daily.csv&quot;</span></span>
-<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Parse counties</span></span>
-<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a>            df_counties <span class="op">=</span> df_cfg[df_cfg[<span class="st">&quot;type&quot;</span>].<span class="bu">str</span>.lower().<span class="bu">str</span>.strip() <span class="op">==</span> <span class="st">&quot;county&quot;</span>]</span>
-<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="kw">not</span> df_counties.empty:</span>
-<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a>                counties_list <span class="op">=</span> []</span>
-<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a>                <span class="cf">for</span> _, row <span class="kw">in</span> df_counties.iterrows():</span>
-<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>                    fips <span class="op">=</span> <span class="bu">str</span>(row[<span class="st">&quot;code&quot;</span>]).strip()</span>
-<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>                    name <span class="op">=</span> <span class="bu">str</span>(row[<span class="st">&quot;name&quot;</span>]).strip()</span>
-<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>                    label <span class="op">=</span> <span class="bu">str</span>(row[<span class="st">&quot;label&quot;</span>]).strip() <span class="cf">if</span> pd.notna(row[<span class="st">&quot;label&quot;</span>]) <span class="kw">and</span> <span class="bu">str</span>(row[<span class="st">&quot;label&quot;</span>]).strip() <span class="op">!=</span> <span class="st">&quot;&quot;</span> <span class="cf">else</span> name</span>
-<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>                    <span class="co"># Dynamic filename for custom county</span></span>
-<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>                    filename <span class="op">=</span> <span class="ss">f&quot;</span><span class="sc">{</span>name<span class="sc">.</span>lower()<span class="sc">.</span>replace(<span class="st">&#39; &#39;</span>, <span class="st">&#39;_&#39;</span>)<span class="sc">.</span>replace(<span class="st">&#39;.&#39;</span>, <span class="st">&#39;&#39;</span>)<span class="sc">}</span><span class="ss">_drought_weekly.csv&quot;</span></span>
-<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>                    counties_list.append({</span>
-<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;fips&quot;</span>: fips,</span>
-<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;name&quot;</span>: name,</span>
-<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;label&quot;</span>: label,</span>
-<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;filename&quot;</span>: filename</span>
-<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a>                    })</span>
-<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a>                config[<span class="st">&quot;counties&quot;</span>] <span class="op">=</span> counties_list</span>
-<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
-<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f&quot;Warning: Failed to load config.csv (</span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">). Using defaults.&quot;</span>)</span>
-<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> config</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: introduction</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rainDrought.visualizations <span class="im">import</span> show_collect_data_intro</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>show_collect_data_intro(config)</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>***</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a><span class="fu"># Data Sources &amp; Citations</span></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**U.S. Drought Monitor (USDM)**</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>**Source**: National Drought Mitigation Center (NDMC), University of Nebraska-Lincoln, USDA, and NOAA.</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>**Description**: Weekly reports of drought severity classifications (None, D0-D4) indicating the percentage of area affected.</span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>**Data Access**: Retrieved via the USDM REST Data Services API: <span class="in">`https://usdmdataservices.unl.edu/api/`</span>.</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>**Citation**:</span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a><span class="at">     &gt; U.S. Drought Monitor. (2026). *U.S. Drought Monitor data archives*. National Drought Mitigation Center. Retrieved from https://droughtmonitor.unl.edu/</span></span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Applied Climate Information System (ACIS)**</span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>**Source**: NOAA Regional Climate Centers (RCCs).</span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>**Description**: Daily precipitation observations aggregated and interpolated across the state of South Dakota, computed as a statewide mean.</span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>**Data Access**: Retrieved via the ACIS GridData API: <span class="in">`https://data.rcc-acis.org/GridData`</span>.</span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>**Citation**:</span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a><span class="at">     &gt; Applied Climate Information System (ACIS). (2026). *Gridded Daily Precipitation (NRCC Interpolated Grid)*. NOAA Regional Climate Centers. Retrieved from https://www.rcc-acis.org/</span></span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>***</span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a><span class="fu"># Data Collection Pipeline</span></span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>The following Python block dynamically computes the date range for the past 10 years and calls the respective APIs to fetch and store the records.</span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: data-collection</span></span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rainDrought.data_pipeline <span class="im">import</span> run_pipeline</span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>run_pipeline(config)</span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>***</span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a><span class="fu"># Data Previews &amp; Summaries</span></span>
+<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a>Let&#39;s load the saved datasets to verify their content and print summary statistics.</span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: usdm-summaries</span></span>
+<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
 <span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> get_config()</span>
-<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: introduction</span></span>
-<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
-<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-99"><a href="#cb8-99" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> display, Markdown</span>
-<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a>county_bullets <span class="op">=</span> <span class="st">&quot;&quot;</span>.join([<span class="ss">f&quot;</span><span class="sc">{</span>c[<span class="st">&#39;name&#39;</span>]<span class="sc">}</span><span class="ss"> (FIPS </span><span class="sc">{</span>c[<span class="st">&#39;fips&#39;</span>]<span class="sc">}</span><span class="ss">), &quot;</span> <span class="cf">for</span> c <span class="kw">in</span> config[<span class="st">&quot;counties&quot;</span>]])</span>
-<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a>display(Markdown(<span class="ss">f&quot;&quot;&quot;</span></span>
-<span id="cb8-104"><a href="#cb8-104" aria-hidden="true" tabindex="-1"></a><span class="ss"># Introduction</span></span>
-<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-106"><a href="#cb8-106" aria-hidden="true" tabindex="-1"></a><span class="ss">This document contains Python code to programmatically retrieve, process, and store 10-year historical climate records for:</span></span>
-<span id="cb8-107"><a href="#cb8-107" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-108"><a href="#cb8-108" aria-hidden="true" tabindex="-1"></a><span class="ss">1. **Weekly Drought Monitor records** for </span><span class="sc">{</span>county_bullets<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>config[<span class="st">&#39;state_name&#39;</span>]<span class="sc">}</span><span class="ss">.</span></span>
-<span id="cb8-109"><a href="#cb8-109" aria-hidden="true" tabindex="-1"></a><span class="ss">2. **Daily Precipitation records** for the state of </span><span class="sc">{</span>config[<span class="st">&#39;state_name&#39;</span>]<span class="sc">}</span><span class="ss"> (state-wide mean).</span></span>
-<span id="cb8-110"><a href="#cb8-110" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-111"><a href="#cb8-111" aria-hidden="true" tabindex="-1"></a><span class="ss">The default datasets are saved to the [`data`](https://github.com/byandell/rainDrought/tree/main/data) directory.</span></span>
-<span id="cb8-112"><a href="#cb8-112" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-113"><a href="#cb8-113" aria-hidden="true" tabindex="-1"></a><span class="ss">&gt; [!NOTE]</span></span>
-<span id="cb8-114"><a href="#cb8-114" aria-hidden="true" tabindex="-1"></a><span class="ss">&gt; **Active Region Configuration**: Default configured for **</span><span class="sc">{</span>config[<span class="st">&#39;state_name&#39;</span>]<span class="sc">}</span><span class="ss">** (precipitation) and counties: </span><span class="sc">{</span><span class="st">&quot;, &quot;</span><span class="sc">.</span>join([<span class="ss">f&quot;</span><span class="sc">{</span>c[<span class="st">&#39;name&#39;</span>]<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span>c[<span class="st">&#39;label&#39;</span>]<span class="sc">}</span><span class="ss">)&quot;</span> <span class="cf">for</span> c <span class="kw">in</span> config[<span class="st">&#39;counties&#39;</span>]])<span class="sc">}</span><span class="ss">.</span></span>
-<span id="cb8-115"><a href="#cb8-115" aria-hidden="true" tabindex="-1"></a><span class="ss">&gt; To customize these locations, copy the layout from `config.csv.default` (or the example from `config.csv.example`) into a new `config.csv` file and re-run.</span></span>
-<span id="cb8-116"><a href="#cb8-116" aria-hidden="true" tabindex="-1"></a><span class="ss">&quot;&quot;&quot;</span>))</span>
-<span id="cb8-117"><a href="#cb8-117" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-118"><a href="#cb8-118" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-119"><a href="#cb8-119" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a>***</span>
-<span id="cb8-121"><a href="#cb8-121" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-122"><a href="#cb8-122" aria-hidden="true" tabindex="-1"></a><span class="fu"># Data Sources &amp; Citations</span></span>
-<span id="cb8-123"><a href="#cb8-123" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-124"><a href="#cb8-124" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**U.S. Drought Monitor (USDM)**</span>
-<span id="cb8-125"><a href="#cb8-125" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>**Source**: National Drought Mitigation Center (NDMC), University of Nebraska-Lincoln, USDA, and NOAA.</span>
-<span id="cb8-126"><a href="#cb8-126" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>**Description**: Weekly reports of drought severity classifications (None, D0-D4) indicating the percentage of area affected.</span>
-<span id="cb8-127"><a href="#cb8-127" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>**Data Access**: Retrieved via the USDM REST Data Services API: <span class="in">`https://usdmdataservices.unl.edu/api/`</span>.</span>
-<span id="cb8-128"><a href="#cb8-128" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>**Citation**:</span>
-<span id="cb8-129"><a href="#cb8-129" aria-hidden="true" tabindex="-1"></a><span class="at">     &gt; U.S. Drought Monitor. (2026). *U.S. Drought Monitor data archives*. National Drought Mitigation Center. Retrieved from https://droughtmonitor.unl.edu/</span></span>
-<span id="cb8-130"><a href="#cb8-130" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-131"><a href="#cb8-131" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Applied Climate Information System (ACIS)**</span>
-<span id="cb8-132"><a href="#cb8-132" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>**Source**: NOAA Regional Climate Centers (RCCs).</span>
-<span id="cb8-133"><a href="#cb8-133" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>**Description**: Daily precipitation observations aggregated and interpolated across the state of South Dakota, computed as a statewide mean.</span>
-<span id="cb8-134"><a href="#cb8-134" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>**Data Access**: Retrieved via the ACIS GridData API: <span class="in">`https://data.rcc-acis.org/GridData`</span>.</span>
-<span id="cb8-135"><a href="#cb8-135" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>**Citation**:</span>
-<span id="cb8-136"><a href="#cb8-136" aria-hidden="true" tabindex="-1"></a><span class="at">     &gt; Applied Climate Information System (ACIS). (2026). *Gridded Daily Precipitation (NRCC Interpolated Grid)*. NOAA Regional Climate Centers. Retrieved from https://www.rcc-acis.org/</span></span>
-<span id="cb8-137"><a href="#cb8-137" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-138"><a href="#cb8-138" aria-hidden="true" tabindex="-1"></a>***</span>
-<span id="cb8-139"><a href="#cb8-139" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-140"><a href="#cb8-140" aria-hidden="true" tabindex="-1"></a><span class="fu"># Data Collection Pipeline</span></span>
-<span id="cb8-141"><a href="#cb8-141" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-142"><a href="#cb8-142" aria-hidden="true" tabindex="-1"></a>The following Python block dynamically computes the date range for the past 10 years and calls the respective APIs to fetch and store the records.</span>
-<span id="cb8-143"><a href="#cb8-143" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-146"><a href="#cb8-146" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb8-147"><a href="#cb8-147" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: data-collection</span></span>
-<span id="cb8-148"><a href="#cb8-148" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb8-149"><a href="#cb8-149" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb8-150"><a href="#cb8-150" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-151"><a href="#cb8-151" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> datetime</span>
-<span id="cb8-152"><a href="#cb8-152" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
-<span id="cb8-153"><a href="#cb8-153" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-154"><a href="#cb8-154" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Active State: </span><span class="sc">{</span>config[<span class="st">&#39;state_name&#39;</span>]<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span>config[<span class="st">&#39;state&#39;</span>]<span class="sc">}</span><span class="ss">)&quot;</span>)</span>
-<span id="cb8-155"><a href="#cb8-155" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Active Counties:&quot;</span>)</span>
-<span id="cb8-156"><a href="#cb8-156" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> county <span class="kw">in</span> config[<span class="st">&quot;counties&quot;</span>]:</span>
-<span id="cb8-157"><a href="#cb8-157" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;  - </span><span class="sc">{</span>county[<span class="st">&#39;name&#39;</span>]<span class="sc">}</span><span class="ss"> (FIPS: </span><span class="sc">{</span>county[<span class="st">&#39;fips&#39;</span>]<span class="sc">}</span><span class="ss">, Label: </span><span class="sc">{</span>county[<span class="st">&#39;label&#39;</span>]<span class="sc">}</span><span class="ss">)&quot;</span>)</span>
-<span id="cb8-158"><a href="#cb8-158" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-159"><a href="#cb8-159" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-160"><a href="#cb8-160" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate dynamic dates for the past 10 years</span></span>
-<span id="cb8-161"><a href="#cb8-161" aria-hidden="true" tabindex="-1"></a>today <span class="op">=</span> datetime.date.today()</span>
-<span id="cb8-162"><a href="#cb8-162" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
-<span id="cb8-163"><a href="#cb8-163" aria-hidden="true" tabindex="-1"></a>    start_date <span class="op">=</span> today.replace(year<span class="op">=</span>today.year <span class="op">-</span> <span class="dv">10</span>)</span>
-<span id="cb8-164"><a href="#cb8-164" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">ValueError</span>:</span>
-<span id="cb8-165"><a href="#cb8-165" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Handle leap year edge case (Feb 29)</span></span>
-<span id="cb8-166"><a href="#cb8-166" aria-hidden="true" tabindex="-1"></a>    start_date <span class="op">=</span> today.replace(year<span class="op">=</span>today.year <span class="op">-</span> <span class="dv">10</span>, day<span class="op">=</span><span class="dv">28</span>)</span>
-<span id="cb8-167"><a href="#cb8-167" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-168"><a href="#cb8-168" aria-hidden="true" tabindex="-1"></a>start_date_str <span class="op">=</span> start_date.strftime(<span class="st">&quot;%Y-%m-</span><span class="sc">%d</span><span class="st">&quot;</span>)</span>
-<span id="cb8-169"><a href="#cb8-169" aria-hidden="true" tabindex="-1"></a>end_date_str <span class="op">=</span> today.strftime(<span class="st">&quot;%Y-%m-</span><span class="sc">%d</span><span class="st">&quot;</span>)</span>
-<span id="cb8-170"><a href="#cb8-170" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-171"><a href="#cb8-171" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="ch">\n</span><span class="ss">Collection timeframe: </span><span class="sc">{</span>start_date_str<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>end_date_str<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb8-172"><a href="#cb8-172" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-173"><a href="#cb8-173" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Task 1: Fetch U.S. Drought Monitor Data for Counties ---</span></span>
-<span id="cb8-174"><a href="#cb8-174" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> county <span class="kw">in</span> config[<span class="st">&quot;counties&quot;</span>]:</span>
-<span id="cb8-175"><a href="#cb8-175" aria-hidden="true" tabindex="-1"></a>    fips_code <span class="op">=</span> county[<span class="st">&quot;fips&quot;</span>]</span>
-<span id="cb8-176"><a href="#cb8-176" aria-hidden="true" tabindex="-1"></a>    county_name <span class="op">=</span> county[<span class="st">&quot;name&quot;</span>]</span>
-<span id="cb8-177"><a href="#cb8-177" aria-hidden="true" tabindex="-1"></a>    filename <span class="op">=</span> county[<span class="st">&quot;filename&quot;</span>]</span>
-<span id="cb8-178"><a href="#cb8-178" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-179"><a href="#cb8-179" aria-hidden="true" tabindex="-1"></a>    usdm_url <span class="op">=</span> (</span>
-<span id="cb8-180"><a href="#cb8-180" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f&quot;https://usdmdataservices.unl.edu/api/CountyStatistics/GetDroughtSeverityStatisticsByAreaPercent&quot;</span></span>
-<span id="cb8-181"><a href="#cb8-181" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f&quot;?aoi=</span><span class="sc">{</span>fips_code<span class="sc">}</span><span class="ss">&amp;startdate=</span><span class="sc">{</span>start_date_str<span class="sc">}</span><span class="ss">&amp;enddate=</span><span class="sc">{</span>end_date_str<span class="sc">}</span><span class="ss">&amp;statisticsType=1&quot;</span></span>
-<span id="cb8-182"><a href="#cb8-182" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb8-183"><a href="#cb8-183" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Querying USDM API for </span><span class="sc">{</span>county_name<span class="sc">}</span><span class="ss">...&quot;</span>)</span>
-<span id="cb8-184"><a href="#cb8-184" aria-hidden="true" tabindex="-1"></a>    usdm_response <span class="op">=</span> requests.get(usdm_url)</span>
-<span id="cb8-185"><a href="#cb8-185" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> usdm_response.status_code <span class="op">==</span> <span class="dv">200</span>:</span>
-<span id="cb8-186"><a href="#cb8-186" aria-hidden="true" tabindex="-1"></a>        usdm_csv <span class="op">=</span> usdm_response.text</span>
-<span id="cb8-187"><a href="#cb8-187" aria-hidden="true" tabindex="-1"></a>        usdm_path <span class="op">=</span> os.path.join(<span class="st">&quot;data&quot;</span>, filename)</span>
-<span id="cb8-188"><a href="#cb8-188" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> <span class="bu">open</span>(usdm_path, <span class="st">&quot;w&quot;</span>, encoding<span class="op">=</span><span class="st">&quot;utf-8&quot;</span>) <span class="im">as</span> f:</span>
-<span id="cb8-189"><a href="#cb8-189" aria-hidden="true" tabindex="-1"></a>            f.write(usdm_csv)</span>
-<span id="cb8-190"><a href="#cb8-190" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;-&gt; Successfully saved weekly drought data to </span><span class="sc">{</span>usdm_path<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb8-191"><a href="#cb8-191" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb8-192"><a href="#cb8-192" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;-&gt; Error fetching USDM data for </span><span class="sc">{</span>county_name<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>usdm_response<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb8-193"><a href="#cb8-193" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(usdm_response.text[:<span class="dv">500</span>])</span>
-<span id="cb8-194"><a href="#cb8-194" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-195"><a href="#cb8-195" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Task 2: Fetch Daily Precipitation Records for State Mean ---</span></span>
-<span id="cb8-196"><a href="#cb8-196" aria-hidden="true" tabindex="-1"></a>acis_url <span class="op">=</span> <span class="st">&quot;https://data.rcc-acis.org/GridData&quot;</span></span>
-<span id="cb8-197"><a href="#cb8-197" aria-hidden="true" tabindex="-1"></a>acis_payload <span class="op">=</span> {</span>
-<span id="cb8-198"><a href="#cb8-198" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;state&quot;</span>: config[<span class="st">&quot;state&quot;</span>],</span>
-<span id="cb8-199"><a href="#cb8-199" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;sdate&quot;</span>: start_date_str,</span>
-<span id="cb8-200"><a href="#cb8-200" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;edate&quot;</span>: end_date_str,</span>
-<span id="cb8-201"><a href="#cb8-201" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;grid&quot;</span>: <span class="st">&quot;1&quot;</span>,</span>
-<span id="cb8-202"><a href="#cb8-202" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;elems&quot;</span>: [{<span class="st">&quot;name&quot;</span>: <span class="st">&quot;pcpn&quot;</span>, <span class="st">&quot;area_reduce&quot;</span>: <span class="st">&quot;state_mean&quot;</span>}]</span>
-<span id="cb8-203"><a href="#cb8-203" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb8-204"><a href="#cb8-204" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-205"><a href="#cb8-205" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Querying ACIS GridData API...&quot;</span>)</span>
-<span id="cb8-206"><a href="#cb8-206" aria-hidden="true" tabindex="-1"></a>acis_response <span class="op">=</span> requests.post(acis_url, json<span class="op">=</span>acis_payload)</span>
-<span id="cb8-207"><a href="#cb8-207" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> acis_response.status_code <span class="op">==</span> <span class="dv">200</span>:</span>
-<span id="cb8-208"><a href="#cb8-208" aria-hidden="true" tabindex="-1"></a>    acis_json <span class="op">=</span> acis_response.json()</span>
-<span id="cb8-209"><a href="#cb8-209" aria-hidden="true" tabindex="-1"></a>    raw_records <span class="op">=</span> acis_json.get(<span class="st">&quot;data&quot;</span>, [])</span>
-<span id="cb8-210"><a href="#cb8-210" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-211"><a href="#cb8-211" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Process the nested list format into a standard DataFrame</span></span>
-<span id="cb8-212"><a href="#cb8-212" aria-hidden="true" tabindex="-1"></a>    processed <span class="op">=</span> []</span>
-<span id="cb8-213"><a href="#cb8-213" aria-hidden="true" tabindex="-1"></a>    state_key <span class="op">=</span> config[<span class="st">&quot;state&quot;</span>].upper()</span>
-<span id="cb8-214"><a href="#cb8-214" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> date_val, val_dict <span class="kw">in</span> raw_records:</span>
-<span id="cb8-215"><a href="#cb8-215" aria-hidden="true" tabindex="-1"></a>        val <span class="op">=</span> val_dict.get(state_key) <span class="cf">if</span> <span class="bu">isinstance</span>(val_dict, <span class="bu">dict</span>) <span class="cf">else</span> <span class="va">None</span></span>
-<span id="cb8-216"><a href="#cb8-216" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Handle potential trace (&#39;T&#39;) or missing (&#39;M&#39;) string codes</span></span>
-<span id="cb8-217"><a href="#cb8-217" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> val <span class="kw">is</span> <span class="va">None</span> <span class="kw">or</span> val <span class="kw">in</span> [<span class="st">&quot;M&quot;</span>, <span class="st">&quot;M &quot;</span>, <span class="st">&quot; M&quot;</span>, <span class="st">&quot;&quot;</span>]:</span>
-<span id="cb8-218"><a href="#cb8-218" aria-hidden="true" tabindex="-1"></a>            val_float <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb8-219"><a href="#cb8-219" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> val <span class="op">==</span> <span class="st">&quot;T&quot;</span> <span class="kw">or</span> val <span class="op">==</span> <span class="st">&quot;T &quot;</span>:</span>
-<span id="cb8-220"><a href="#cb8-220" aria-hidden="true" tabindex="-1"></a>            val_float <span class="op">=</span> <span class="fl">0.0001</span></span>
-<span id="cb8-221"><a href="#cb8-221" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb8-222"><a href="#cb8-222" aria-hidden="true" tabindex="-1"></a>            <span class="cf">try</span>:</span>
-<span id="cb8-223"><a href="#cb8-223" aria-hidden="true" tabindex="-1"></a>                val_float <span class="op">=</span> <span class="bu">float</span>(val)</span>
-<span id="cb8-224"><a href="#cb8-224" aria-hidden="true" tabindex="-1"></a>            <span class="cf">except</span> <span class="pp">ValueError</span>:</span>
-<span id="cb8-225"><a href="#cb8-225" aria-hidden="true" tabindex="-1"></a>                val_float <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb8-226"><a href="#cb8-226" aria-hidden="true" tabindex="-1"></a>        processed.append({<span class="st">&quot;date&quot;</span>: date_val, <span class="st">&quot;precipitation_inches&quot;</span>: val_float})</span>
-<span id="cb8-227"><a href="#cb8-227" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb8-228"><a href="#cb8-228" aria-hidden="true" tabindex="-1"></a>    df_precip <span class="op">=</span> pd.DataFrame(processed)</span>
-<span id="cb8-229"><a href="#cb8-229" aria-hidden="true" tabindex="-1"></a>    precip_path <span class="op">=</span> os.path.join(<span class="st">&quot;data&quot;</span>, config[<span class="st">&quot;precip_filename&quot;</span>])</span>
-<span id="cb8-230"><a href="#cb8-230" aria-hidden="true" tabindex="-1"></a>    df_precip.to_csv(precip_path, index<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb8-231"><a href="#cb8-231" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;-&gt; Successfully saved daily precipitation data to </span><span class="sc">{</span>precip_path<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb8-232"><a href="#cb8-232" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb8-233"><a href="#cb8-233" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;-&gt; Error fetching ACIS data: </span><span class="sc">{</span>acis_response<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb8-234"><a href="#cb8-234" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(acis_response.text[:<span class="dv">500</span>])</span>
-<span id="cb8-235"><a href="#cb8-235" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-236"><a href="#cb8-236" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-237"><a href="#cb8-237" aria-hidden="true" tabindex="-1"></a>***</span>
-<span id="cb8-238"><a href="#cb8-238" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-239"><a href="#cb8-239" aria-hidden="true" tabindex="-1"></a><span class="fu"># Data Previews &amp; Summaries</span></span>
-<span id="cb8-240"><a href="#cb8-240" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-241"><a href="#cb8-241" aria-hidden="true" tabindex="-1"></a>Let&#39;s load the saved datasets to verify their content and print summary statistics.</span>
-<span id="cb8-242"><a href="#cb8-242" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-245"><a href="#cb8-245" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb8-246"><a href="#cb8-246" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: usdm-summaries</span></span>
-<span id="cb8-247"><a href="#cb8-247" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb8-248"><a href="#cb8-248" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: asis</span></span>
-<span id="cb8-249"><a href="#cb8-249" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-250"><a href="#cb8-250" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> display, Markdown</span>
-<span id="cb8-251"><a href="#cb8-251" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-252"><a href="#cb8-252" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> county <span class="kw">in</span> config[<span class="st">&quot;counties&quot;</span>]:</span>
-<span id="cb8-253"><a href="#cb8-253" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> county[<span class="st">&quot;name&quot;</span>]</span>
-<span id="cb8-254"><a href="#cb8-254" aria-hidden="true" tabindex="-1"></a>    filename <span class="op">=</span> county[<span class="st">&quot;filename&quot;</span>]</span>
-<span id="cb8-255"><a href="#cb8-255" aria-hidden="true" tabindex="-1"></a>    csv_path <span class="op">=</span> os.path.join(<span class="st">&quot;data&quot;</span>, filename)</span>
-<span id="cb8-256"><a href="#cb8-256" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-257"><a href="#cb8-257" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> os.path.exists(csv_path):</span>
-<span id="cb8-258"><a href="#cb8-258" aria-hidden="true" tabindex="-1"></a>        df_c <span class="op">=</span> pd.read_csv(csv_path)</span>
-<span id="cb8-259"><a href="#cb8-259" aria-hidden="true" tabindex="-1"></a>        df_c[<span class="st">&quot;ValidStart&quot;</span>] <span class="op">=</span> pd.to_datetime(df_c[<span class="st">&quot;ValidStart&quot;</span>])</span>
-<span id="cb8-260"><a href="#cb8-260" aria-hidden="true" tabindex="-1"></a>        df_c[<span class="st">&quot;ValidEnd&quot;</span>] <span class="op">=</span> pd.to_datetime(df_c[<span class="st">&quot;ValidEnd&quot;</span>])</span>
-<span id="cb8-261"><a href="#cb8-261" aria-hidden="true" tabindex="-1"></a>        df_c <span class="op">=</span> df_c.sort_values(<span class="st">&quot;ValidStart&quot;</span>).reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb8-262"><a href="#cb8-262" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb8-263"><a href="#cb8-263" aria-hidden="true" tabindex="-1"></a>        display(Markdown(<span class="ss">f&quot;## U.S. Drought Monitor Data Summary (</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">)&quot;</span>))</span>
-<span id="cb8-264"><a href="#cb8-264" aria-hidden="true" tabindex="-1"></a>        display(Markdown(<span class="ss">f&quot;**Weekly USDM records:** </span><span class="sc">{</span><span class="bu">len</span>(df_c)<span class="sc">}</span><span class="ss">&quot;</span>))</span>
-<span id="cb8-265"><a href="#cb8-265" aria-hidden="true" tabindex="-1"></a>        display(df_c[[<span class="st">&quot;ValidStart&quot;</span>, <span class="st">&quot;County&quot;</span>, <span class="st">&quot;None&quot;</span>, <span class="st">&quot;D0&quot;</span>, <span class="st">&quot;D1&quot;</span>, <span class="st">&quot;D2&quot;</span>, <span class="st">&quot;D3&quot;</span>, <span class="st">&quot;D4&quot;</span>]].tail())</span>
-<span id="cb8-266"><a href="#cb8-266" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb8-267"><a href="#cb8-267" aria-hidden="true" tabindex="-1"></a>        display(Markdown(<span class="ss">f&quot;### </span><span class="sc">{</span>name<span class="sc">}</span><span class="ss"> Drought Summary Stats&quot;</span>))</span>
-<span id="cb8-268"><a href="#cb8-268" aria-hidden="true" tabindex="-1"></a>        display(df_c[[<span class="st">&quot;None&quot;</span>, <span class="st">&quot;D0&quot;</span>, <span class="st">&quot;D1&quot;</span>, <span class="st">&quot;D2&quot;</span>, <span class="st">&quot;D3&quot;</span>, <span class="st">&quot;D4&quot;</span>]].describe())</span>
-<span id="cb8-269"><a href="#cb8-269" aria-hidden="true" tabindex="-1"></a>        display(Markdown(<span class="st">&quot;***&quot;</span>))</span>
-<span id="cb8-270"><a href="#cb8-270" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-271"><a href="#cb8-271" aria-hidden="true" tabindex="-1"></a>precip_path <span class="op">=</span> os.path.join(<span class="st">&quot;data&quot;</span>, config[<span class="st">&quot;precip_filename&quot;</span>])</span>
-<span id="cb8-272"><a href="#cb8-272" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.path.exists(precip_path):</span>
-<span id="cb8-273"><a href="#cb8-273" aria-hidden="true" tabindex="-1"></a>    df_precip <span class="op">=</span> pd.read_csv(precip_path)</span>
-<span id="cb8-274"><a href="#cb8-274" aria-hidden="true" tabindex="-1"></a>    df_precip[<span class="st">&quot;date&quot;</span>] <span class="op">=</span> pd.to_datetime(df_precip[<span class="st">&quot;date&quot;</span>])</span>
-<span id="cb8-275"><a href="#cb8-275" aria-hidden="true" tabindex="-1"></a>    df_precip <span class="op">=</span> df_precip.sort_values(<span class="st">&quot;date&quot;</span>).reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb8-276"><a href="#cb8-276" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-277"><a href="#cb8-277" aria-hidden="true" tabindex="-1"></a>    display(Markdown(<span class="ss">f&quot;## Daily Precipitation Data Summary (</span><span class="sc">{</span>config[<span class="st">&#39;state_name&#39;</span>]<span class="sc">}</span><span class="ss">)&quot;</span>))</span>
-<span id="cb8-278"><a href="#cb8-278" aria-hidden="true" tabindex="-1"></a>    display(Markdown(<span class="ss">f&quot;**Number of daily precipitation records:** </span><span class="sc">{</span><span class="bu">len</span>(df_precip)<span class="sc">}</span><span class="ss">&quot;</span>))</span>
-<span id="cb8-279"><a href="#cb8-279" aria-hidden="true" tabindex="-1"></a>    display(df_precip.tail())</span>
-<span id="cb8-280"><a href="#cb8-280" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-281"><a href="#cb8-281" aria-hidden="true" tabindex="-1"></a>    display(Markdown(<span class="ss">f&quot;### Precipitation Summary Stats&quot;</span>))</span>
-<span id="cb8-282"><a href="#cb8-282" aria-hidden="true" tabindex="-1"></a>    display(df_precip[<span class="st">&quot;precipitation_inches&quot;</span>].describe())</span>
-<span id="cb8-283"><a href="#cb8-283" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-284"><a href="#cb8-284" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-285"><a href="#cb8-285" aria-hidden="true" tabindex="-1"></a>***</span>
-<span id="cb8-286"><a href="#cb8-286" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-287"><a href="#cb8-287" aria-hidden="true" tabindex="-1"></a><span class="fu"># Visualizations</span></span>
-<span id="cb8-288"><a href="#cb8-288" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-289"><a href="#cb8-289" aria-hidden="true" tabindex="-1"></a>Let&#39;s visualize the trends over the 10-year period.</span>
-<span id="cb8-290"><a href="#cb8-290" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-293"><a href="#cb8-293" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb8-294"><a href="#cb8-294" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: plots</span></span>
-<span id="cb8-295"><a href="#cb8-295" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb8-296"><a href="#cb8-296" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb8-297"><a href="#cb8-297" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-width: 7.5</span></span>
-<span id="cb8-298"><a href="#cb8-298" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-height: 9.5</span></span>
-<span id="cb8-299"><a href="#cb8-299" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-300"><a href="#cb8-300" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb8-301"><a href="#cb8-301" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
-<span id="cb8-302"><a href="#cb8-302" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb8-303"><a href="#cb8-303" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-304"><a href="#cb8-304" aria-hidden="true" tabindex="-1"></a>sns.set_theme(style<span class="op">=</span><span class="st">&quot;whitegrid&quot;</span>)</span>
-<span id="cb8-305"><a href="#cb8-305" aria-hidden="true" tabindex="-1"></a>num_counties <span class="op">=</span> <span class="bu">len</span>(config[<span class="st">&quot;counties&quot;</span>])</span>
-<span id="cb8-306"><a href="#cb8-306" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(num_counties <span class="op">+</span> <span class="dv">1</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="fl">7.5</span>, <span class="fl">3.2</span> <span class="op">*</span> (num_counties <span class="op">+</span> <span class="dv">1</span>)), sharex<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb8-307"><a href="#cb8-307" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-308"><a href="#cb8-308" aria-hidden="true" tabindex="-1"></a><span class="co"># Standardize axes indexing if only 1 plot</span></span>
-<span id="cb8-309"><a href="#cb8-309" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> num_counties <span class="op">+</span> <span class="dv">1</span> <span class="op">==</span> <span class="dv">1</span>:</span>
-<span id="cb8-310"><a href="#cb8-310" aria-hidden="true" tabindex="-1"></a>    axes <span class="op">=</span> [axes]</span>
-<span id="cb8-311"><a href="#cb8-311" aria-hidden="true" tabindex="-1"></a><span class="cf">elif</span> <span class="kw">not</span> <span class="bu">isinstance</span>(axes, (<span class="bu">list</span>, np.ndarray)):</span>
-<span id="cb8-312"><a href="#cb8-312" aria-hidden="true" tabindex="-1"></a>    axes <span class="op">=</span> [axes]</span>
-<span id="cb8-313"><a href="#cb8-313" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-314"><a href="#cb8-314" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> idx, county <span class="kw">in</span> <span class="bu">enumerate</span>(config[<span class="st">&quot;counties&quot;</span>]):</span>
-<span id="cb8-315"><a href="#cb8-315" aria-hidden="true" tabindex="-1"></a>    filename <span class="op">=</span> county[<span class="st">&quot;filename&quot;</span>]</span>
-<span id="cb8-316"><a href="#cb8-316" aria-hidden="true" tabindex="-1"></a>    csv_path <span class="op">=</span> os.path.join(<span class="st">&quot;data&quot;</span>, filename)</span>
-<span id="cb8-317"><a href="#cb8-317" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> os.path.exists(csv_path):</span>
-<span id="cb8-318"><a href="#cb8-318" aria-hidden="true" tabindex="-1"></a>        df_c <span class="op">=</span> pd.read_csv(csv_path)</span>
-<span id="cb8-319"><a href="#cb8-319" aria-hidden="true" tabindex="-1"></a>        df_c[<span class="st">&quot;ValidStart&quot;</span>] <span class="op">=</span> pd.to_datetime(df_c[<span class="st">&quot;ValidStart&quot;</span>])</span>
-<span id="cb8-320"><a href="#cb8-320" aria-hidden="true" tabindex="-1"></a>        df_c <span class="op">=</span> df_c.sort_values(<span class="st">&quot;ValidStart&quot;</span>).reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb8-321"><a href="#cb8-321" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb8-322"><a href="#cb8-322" aria-hidden="true" tabindex="-1"></a>        ax <span class="op">=</span> axes[idx]</span>
-<span id="cb8-323"><a href="#cb8-323" aria-hidden="true" tabindex="-1"></a>        ax.fill_between(df_c[<span class="st">&quot;ValidStart&quot;</span>], df_c[<span class="st">&quot;D0&quot;</span>], color<span class="op">=</span><span class="st">&quot;#ffff00&quot;</span>, alpha<span class="op">=</span><span class="fl">0.5</span>, label<span class="op">=</span><span class="st">&quot;D0 (Abnormally Dry)&quot;</span>)</span>
-<span id="cb8-324"><a href="#cb8-324" aria-hidden="true" tabindex="-1"></a>        ax.fill_between(df_c[<span class="st">&quot;ValidStart&quot;</span>], df_c[<span class="st">&quot;D1&quot;</span>], color<span class="op">=</span><span class="st">&quot;#fcd37f&quot;</span>, alpha<span class="op">=</span><span class="fl">0.6</span>, label<span class="op">=</span><span class="st">&quot;D1 (Moderate Drought)&quot;</span>)</span>
-<span id="cb8-325"><a href="#cb8-325" aria-hidden="true" tabindex="-1"></a>        ax.fill_between(df_c[<span class="st">&quot;ValidStart&quot;</span>], df_c[<span class="st">&quot;D2&quot;</span>], color<span class="op">=</span><span class="st">&quot;#ffaa00&quot;</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, label<span class="op">=</span><span class="st">&quot;D2 (Severe Drought)&quot;</span>)</span>
-<span id="cb8-326"><a href="#cb8-326" aria-hidden="true" tabindex="-1"></a>        ax.fill_between(df_c[<span class="st">&quot;ValidStart&quot;</span>], df_c[<span class="st">&quot;D3&quot;</span>], color<span class="op">=</span><span class="st">&quot;#e60000&quot;</span>, alpha<span class="op">=</span><span class="fl">0.8</span>, label<span class="op">=</span><span class="st">&quot;D3 (Extreme Drought)&quot;</span>)</span>
-<span id="cb8-327"><a href="#cb8-327" aria-hidden="true" tabindex="-1"></a>        ax.fill_between(df_c[<span class="st">&quot;ValidStart&quot;</span>], df_c[<span class="st">&quot;D4&quot;</span>], color<span class="op">=</span><span class="st">&quot;#730000&quot;</span>, alpha<span class="op">=</span><span class="fl">0.9</span>, label<span class="op">=</span><span class="st">&quot;D4 (Exceptional Drought)&quot;</span>)</span>
-<span id="cb8-328"><a href="#cb8-328" aria-hidden="true" tabindex="-1"></a>        ax.set_title(<span class="ss">f&quot;Weekly Drought Monitor Area Severity (%) - </span><span class="sc">{</span>county[<span class="st">&#39;name&#39;</span>]<span class="sc">}</span><span class="ss">&quot;</span>, fontsize<span class="op">=</span><span class="dv">11</span>, fontweight<span class="op">=</span><span class="st">&quot;bold&quot;</span>)</span>
-<span id="cb8-329"><a href="#cb8-329" aria-hidden="true" tabindex="-1"></a>        ax.set_ylabel(<span class="st">&quot;Cumulative % Area affected&quot;</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
-<span id="cb8-330"><a href="#cb8-330" aria-hidden="true" tabindex="-1"></a>        ax.set_ylim(<span class="dv">0</span>, <span class="dv">100</span>)</span>
-<span id="cb8-331"><a href="#cb8-331" aria-hidden="true" tabindex="-1"></a>        ax.legend(loc<span class="op">=</span><span class="st">&quot;upper right&quot;</span>, frameon<span class="op">=</span><span class="va">True</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
-<span id="cb8-332"><a href="#cb8-332" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-333"><a href="#cb8-333" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Monthly Aggregated Precipitation</span></span>
-<span id="cb8-334"><a href="#cb8-334" aria-hidden="true" tabindex="-1"></a>precip_path <span class="op">=</span> os.path.join(<span class="st">&quot;data&quot;</span>, config[<span class="st">&quot;precip_filename&quot;</span>])</span>
-<span id="cb8-335"><a href="#cb8-335" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.path.exists(precip_path):</span>
-<span id="cb8-336"><a href="#cb8-336" aria-hidden="true" tabindex="-1"></a>    df_precip <span class="op">=</span> pd.read_csv(precip_path)</span>
-<span id="cb8-337"><a href="#cb8-337" aria-hidden="true" tabindex="-1"></a>    df_precip[<span class="st">&quot;date&quot;</span>] <span class="op">=</span> pd.to_datetime(df_precip[<span class="st">&quot;date&quot;</span>])</span>
-<span id="cb8-338"><a href="#cb8-338" aria-hidden="true" tabindex="-1"></a>    df_precip <span class="op">=</span> df_precip.sort_values(<span class="st">&quot;date&quot;</span>).reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb8-339"><a href="#cb8-339" aria-hidden="true" tabindex="-1"></a>    df_precip[<span class="st">&quot;year_month&quot;</span>] <span class="op">=</span> df_precip[<span class="st">&quot;date&quot;</span>].dt.to_period(<span class="st">&quot;M&quot;</span>)</span>
-<span id="cb8-340"><a href="#cb8-340" aria-hidden="true" tabindex="-1"></a>    df_monthly <span class="op">=</span> df_precip.groupby(<span class="st">&quot;year_month&quot;</span>)[<span class="st">&quot;precipitation_inches&quot;</span>].<span class="bu">sum</span>().reset_index()</span>
-<span id="cb8-341"><a href="#cb8-341" aria-hidden="true" tabindex="-1"></a>    df_monthly[<span class="st">&quot;date_index&quot;</span>] <span class="op">=</span> df_monthly[<span class="st">&quot;year_month&quot;</span>].dt.to_timestamp()</span>
-<span id="cb8-342"><a href="#cb8-342" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-343"><a href="#cb8-343" aria-hidden="true" tabindex="-1"></a>    ax <span class="op">=</span> axes[num_counties]</span>
-<span id="cb8-344"><a href="#cb8-344" aria-hidden="true" tabindex="-1"></a>    ax.bar(df_monthly[<span class="st">&quot;date_index&quot;</span>], df_monthly[<span class="st">&quot;precipitation_inches&quot;</span>], width<span class="op">=</span><span class="dv">25</span>, color<span class="op">=</span><span class="st">&quot;#1f77b4&quot;</span>, alpha<span class="op">=</span><span class="fl">0.8</span>)</span>
-<span id="cb8-345"><a href="#cb8-345" aria-hidden="true" tabindex="-1"></a>    df_monthly[<span class="st">&quot;rolling_mean&quot;</span>] <span class="op">=</span> df_monthly[<span class="st">&quot;precipitation_inches&quot;</span>].rolling(<span class="dv">12</span>, center<span class="op">=</span><span class="va">True</span>).mean()</span>
-<span id="cb8-346"><a href="#cb8-346" aria-hidden="true" tabindex="-1"></a>    ax.plot(df_monthly[<span class="st">&quot;date_index&quot;</span>], df_monthly[<span class="st">&quot;rolling_mean&quot;</span>], color<span class="op">=</span><span class="st">&quot;#d62728&quot;</span>, linewidth<span class="op">=</span><span class="fl">2.2</span>, label<span class="op">=</span><span class="st">&quot;12-Month Rolling Mean&quot;</span>)</span>
-<span id="cb8-347"><a href="#cb8-347" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f&quot;</span><span class="sc">{</span>config[<span class="st">&#39;state_name&#39;</span>]<span class="sc">}</span><span class="ss"> Monthly Total Precipitation (Statewide Average)&quot;</span>, fontsize<span class="op">=</span><span class="dv">11</span>, fontweight<span class="op">=</span><span class="st">&quot;bold&quot;</span>)</span>
-<span id="cb8-348"><a href="#cb8-348" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">&quot;Precipitation (inches)&quot;</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
-<span id="cb8-349"><a href="#cb8-349" aria-hidden="true" tabindex="-1"></a>    ax.legend(loc<span class="op">=</span><span class="st">&quot;upper right&quot;</span>, frameon<span class="op">=</span><span class="va">True</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
-<span id="cb8-350"><a href="#cb8-350" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-351"><a href="#cb8-351" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb8-352"><a href="#cb8-352" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb8-353"><a href="#cb8-353" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rainDrought.data_pipeline <span class="im">import</span> show_summaries</span>
+<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a>show_summaries(config)</span>
+<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a>***</span>
+<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a><span class="fu"># Visualizations</span></span>
+<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a>Let&#39;s visualize the trends over the 10-year period.</span>
+<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: plots</span></span>
+<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
+<span id="cb8-104"><a href="#cb8-104" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-width: 7.5</span></span>
+<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-height: 9.5</span></span>
+<span id="cb8-106"><a href="#cb8-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-107"><a href="#cb8-107" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rainDrought.visualizations <span class="im">import</span> plot_matplotlib_trends</span>
+<span id="cb8-108"><a href="#cb8-108" aria-hidden="true" tabindex="-1"></a>plot_matplotlib_trends(config)</span>
+<span id="cb8-109"><a href="#cb8-109" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

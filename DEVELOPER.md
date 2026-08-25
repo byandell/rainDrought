@@ -8,20 +8,24 @@ Welcome to the Developer Documentation for the South Dakota Rain and Drought Ana
 
 This repository is structured as a **Quarto Website** that processes and visualizes 10 years of South Dakota mean daily precipitation and county-level weekly U.S. Drought Monitor (USDM) statistics. 
 
-### Key Files
-- **[`_quarto.yml`](_quarto.yml)**: The main configuration file specifying the website title, navigation bar, format options (such as `embed-resources: true` to generate self-contained HTML files), and the output directory (`docs`).
-- **[`index.qmd`](index.qmd)**: The website's welcome page containing project goals, background, and data source links.
-- **[`collect_data.qmd`](collect_data.qmd)**: A Python-based data collection pipeline. It queries external REST APIs, processes raw inputs, and caches the records as CSVs in `data/`.
-- **[`plot_records.qmd`](plot_records.qmd)**: A Python-based interactive dashboard that leverages **Plotly** to visualize trends and trajectories.
-- **[`AGENTS.md`](AGENTS.md)**: Coding style guide and instructions for AI agents.
-- **[`README.md`](README.md)**: Quick-start guide and general repository overview.
+### Key Directories & Files
+- **[`rainDrought/`](rainDrought/)**: A dedicated Python package housing the core climate data collection, cleaning, and visualization scripts:
+  - [`config.py`](rainDrought/config.py): Dynamic parser for regional county/state custom settings.
+  - [`data_pipeline.py`](rainDrought/data_pipeline.py): Automates REST API fetching from USDM and ACIS endpoints.
+  - [`visualizations.py`](rainDrought/visualizations.py): Handles data preprocessing, Matplotlib charts, and interactive Plotly subplots.
+- **[`_quarto.yml`](_quarto.yml)**: Quarto configuration setting format options, navbar layout, and build output paths.
+- **[`index.qmd`](index.qmd)**: Welcome page containing overview texts and data source links.
+- **[`collect_data.qmd`](collect_data.qmd)**: Page compiling the data fetching pipeline (calls functions in `rainDrought.data_pipeline`).
+- **[`plot_records.qmd`](plot_records.qmd)**: Page compiling interactive Plotly dashboards (calls functions in `rainDrought.visualizations`).
+- **[`data/`](data/)**: Cache folder containing CSV datasets for precipitation and county drought records.
 
 ### Output Layout
-The site is compiled into the **[`docs/`](docs/)** directory:
+The site is compiled into the **[`docs/`](docs/)** directory for GitHub Pages:
 - `docs/index.html` (rendered overview)
-- `docs/collect_data.html` (rendered pipeline logs and summaries)
-- `docs/plot_records.html` (rendered interactive charts)
-- `docs/search.json` (search index for the site)
+- `docs/collect_data.html` (rendered data collection logs)
+- `docs/plot_records.html` (rendered interactive Plotly visualizations)
+- `docs/search.json` (search index for site-wide navigation)
+
 
 > [!IMPORTANT]
 > The directory `docs/site_libs/` is ignored via [`.gitignore`](.gitignore) because all pages are compiled as standalone HTML documents with assets embedded natively. Do not stage or commit files inside `docs/site_libs/`.
