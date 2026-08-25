@@ -1,3 +1,11 @@
+"""
+Configuration Loader for South Dakota Rain and Drought Analysis.
+
+This module handles parsing the `config.csv` configuration file if it exists,
+falling back to default settings (South Dakota state mean precipitation, Oglala 
+Lakota County, and Todd County drought statistics) if the file is missing or invalid.
+"""
+
 import os
 import pandas as pd
 
@@ -21,6 +29,17 @@ DEFAULT_COUNTIES = [
 DEFAULT_PRECIP_FILENAME = "south_dakota_precipitation_daily.csv"
 
 def get_config():
+    """
+    Parses config.csv from the root folder or falls back to defaults.
+
+    Returns:
+        dict: A dictionary containing:
+            - "state" (str): The state postal abbreviation (lowercase).
+            - "state_name" (str): Full official name of the state.
+            - "counties" (list of dict): List of county configurations with keys
+              "fips", "name", "label", and "filename".
+            - "precip_filename" (str): Filename for caching daily precipitation.
+    """
     config = {
         "state": DEFAULT_STATE,
         "state_name": DEFAULT_STATE_NAME,

@@ -1,3 +1,12 @@
+"""
+Data Retrieval and Caching Pipeline.
+
+This module automates querying the U.S. Drought Monitor (USDM) REST API
+for county-level drought metrics and the NOAA Applied Climate Information
+System (ACIS) GridData API for state-wide daily precipitation. The fetched
+records are cleaned, processed, and cached locally as CSV files in the `data/` folder.
+"""
+
 import os
 import datetime
 import requests
@@ -5,6 +14,17 @@ import pandas as pd
 from IPython.display import display, Markdown
 
 def run_pipeline(config):
+    """
+    Executes the data collection pipeline to query, clean, and cache raw climate records.
+
+    This function dynamically calculates a 10-year historical window ending today,
+    submits requests to the USDM API for county drought area percentages, queries
+    the NOAA ACIS API for state-mean daily precipitation, cleans trace ('T') and
+    missing ('M') codes, and saves the cached tables to CSV files.
+
+    Args:
+        config (dict): The active configuration dictionary.
+    """
     # Create target data directory
     os.makedirs("data", exist_ok=True)
 
@@ -90,6 +110,12 @@ def run_pipeline(config):
         print(acis_response.text[:500])
 
 def show_summaries(config):
+    """
+    Loads and renders table summaries and statistics for the cached CSV datasets.
+
+    Args:
+        config (dict): The active configuration dictionary.
+    """
     for county in config["counties"]:
         name = county["name"]
         filename = county["filename"]

@@ -1,3 +1,11 @@
+"""
+Data Visualization Helpers and Dashboards.
+
+This module houses all the rendering and preprocessing functions, including dynamic 
+markdown introductions, static Matplotlib charts, and interactive Plotly subplots 
+for timelines, cumulative progress, and trajectory analyses.
+"""
+
 import os
 import pandas as pd
 import numpy as np
@@ -9,6 +17,12 @@ import plotly.graph_objects as go
 import plotly.express as px
 
 def show_collect_data_intro(config):
+    """
+    Dynamically renders the Markdown Introduction section for collect_data.qmd.
+
+    Args:
+        config (dict): The active configuration dictionary.
+    """
     county_bullets = "".join([f"1. **Weekly Drought Monitor records** for {c['name']} (FIPS {c['fips']}), {config['state_name']}.\n" for c in config["counties"]])
     display(Markdown(f"""
 # Introduction
@@ -25,6 +39,12 @@ The collected datasets are saved to the `data/` directory.
 """))
 
 def show_plot_records_intro(config):
+    """
+    Dynamically renders the Markdown Introduction section for plot_records.qmd.
+
+    Args:
+        config (dict): The active configuration dictionary.
+    """
     county_names_str = " and ".join([c["name"] for c in config["counties"]])
     county_labels_str = " and ".join([c["label"] for c in config["counties"]])
     display(Markdown(f"""
@@ -43,6 +63,12 @@ We will display:
 """))
 
 def plot_matplotlib_trends(config):
+    """
+    Plots a static multi-panel chart of drought index and monthly precipitation totals using Matplotlib.
+
+    Args:
+        config (dict): The active configuration dictionary.
+    """
     sns.set_theme(style="whitegrid")
     num_counties = len(config["counties"])
     fig, axes = plt.subplots(num_counties + 1, 1, figsize=(7.5, 3.2 * (num_counties + 1)), sharex=False)
@@ -94,6 +120,21 @@ def plot_matplotlib_trends(config):
     plt.show()
 
 def load_and_preprocess(config):
+    """
+    Loads daily precipitation and county drought records, aggregates calculations, and aligns them.
+
+    This function cleans the datasets, computes the Drought Severity and Coverage Index (DSCI),
+    calculates cumulative precipitation values since Jan 1st of each year, calculates 365-day 
+    rolling precipitation sums, and merges dataframes on dates.
+
+    Args:
+        config (dict): The active configuration dictionary.
+
+    Returns:
+        tuple: A tuple containing:
+            - merged_dfs (dict): Merged county dataframes indexed by FIPS code.
+            - df_precip (pd.DataFrame): Preprocessed daily precipitation dataframe.
+    """
     # Load precipitation daily data
     precip_path = os.path.join("data", config["precip_filename"])
     df_precip = pd.read_csv(precip_path)
@@ -135,6 +176,16 @@ def load_and_preprocess(config):
     return merged_dfs, df_precip
 
 def plot_time_series(config, merged_dfs):
+    """
+    Creates and returns a Plotly timeline subplot dashboard of climate metrics over 10 years.
+
+    Args:
+        config (dict): The active configuration dictionary.
+        merged_dfs (dict): The merged county dataframes.
+
+    Returns:
+        go.Figure: The constructed Plotly figure.
+    """
     num_counties = len(config["counties"])
     subplot_titles = [f"DSCI - {c['label']}" for c in config["counties"]] + [
         f"365-Day Rolling Precipitation (inches) [{config['state_name']} Mean]"
@@ -221,6 +272,16 @@ def plot_time_series(config, merged_dfs):
     return fig_time
 
 def plot_time_vs_cumulative(config, merged_dfs):
+    """
+    Creates and returns a Plotly dashboard comparing annual cumulative progression over the months of the year.
+
+    Args:
+        config (dict): The active configuration dictionary.
+        merged_dfs (dict): The merged county dataframes.
+
+    Returns:
+        go.Figure: The constructed Plotly figure.
+    """
     first_fips = config["counties"][0]["fips"]
     df_first = merged_dfs[first_fips]
     years = sorted(df_first["year_str"].unique())
@@ -340,6 +401,16 @@ def plot_time_vs_cumulative(config, merged_dfs):
     return fig_cum_time
 
 def plot_combined_annual_trajectories(config, merged_dfs):
+    """
+    Creates and returns a Plotly dashboard showing cumulative rain vs cumulative drought index trajectories.
+
+    Args:
+        config (dict): The active configuration dictionary.
+        merged_dfs (dict): The merged county dataframes.
+
+    Returns:
+        go.Figure: The constructed Plotly figure.
+    """
     first_fips = config["counties"][0]["fips"]
     df_first = merged_dfs[first_fips]
     years = sorted(df_first["year_str"].unique())
