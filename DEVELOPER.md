@@ -182,11 +182,23 @@ quarto render
 ```
 This command compiles `index.qmd`, `collect_data.qmd`, and `plot_records.qmd` into their corresponding HTML pages under the `docs/` folder.
 
-### Run Data Updates
-To run the pipeline and update the data caches:
+### Standalone Execution Script
+For non-Quarto workflows, you can execute the entire collection and plotting process as a standalone Python script:
+```bash
+python rainDrought/run_analysis.py
+```
+This script:
+1. Loads location configurations from `config.csv` (or falls back to default settings).
+2. Automates API data collection and caches datasets to the `data/` folder.
+3. Prints dataset statistics and records directly to the command line.
+4. Generates interactive Plotly plots and saves them as self-contained HTML dashboards in the `output/` folder (`output/time_series.html`, `output/cumulative_progression.html`, and `output/trajectories.html`), then opens them in your default web browser.
+
+### Run Data Updates via Quarto
+To run the pipeline and update the data caches using Quarto:
 ```bash
 quarto render collect_data.qmd
 ```
+
 
 ### GitHub Pages Deployment
 1. Commit all modified source files (`.qmd`, `_quarto.yml`, `data/*.csv`, `DEVELOPER.md`) and the compiled HTML outputs in `/docs`.

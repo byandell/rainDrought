@@ -45,4 +45,8 @@ docs/site_libs/
 !/data/todd_drought_weekly.csv
 !/data/south_dakota_precipitation_daily.csv
 
+# Ignore standalone script output folder
+/output/
+*.zip
+
 

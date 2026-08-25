@@ -60,6 +60,14 @@ with the Conda environment
 Python code is in folder
 [`rainDrought/`](https://github.com/byandell/rainDrought/tree/main/rainDrought/)
 while Quarto code is in the main folder.
+The entire analysis can be completed using the
+[`rainDrought/run_analysis.py`](https://github.com/byandell/rainDrought/blob/main/rainDrought/run_analysis.py)
+script by running the command
+
+```bash
+python run_analysis.py
+```
+
 Website deployment uses GitHub Actions via the
 [`docs/`](https://github.com/byandell/rainDrought/tree/main/docs)
 folder.
