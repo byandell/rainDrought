@@ -1,6 +1,6 @@
 ---
-title: "Precipitation and Drought Records Collection"
-subtitle: "10-Year Historical Records for South Dakota and Oglala Lakota County"
+title: "Rain and Drought Records Collection"
+subtitle: "10-Year Historical Records"
 author: "Antigravity Coding Assistant"
 date: "2026-07-19"
 format:
@@ -12,18 +12,108 @@ format:
     embed-resources: true
 ---
 
+```{python}
+#| label: config-init
+#| warning: false
+#| message: false
+
+import os
+import pandas as pd
+
+# Create target data directory
+os.makedirs("data", exist_ok=True)
+
+# Helper to read configuration with defaults
+DEFAULT_STATE = "sd"
+DEFAULT_STATE_NAME = "South Dakota"
+DEFAULT_COUNTIES = [
+    {
+        "fips": "46102",
+        "name": "Oglala Lakota County",
+        "label": "Pine Ridge",
+        "filename": "oglala_lakota_drought_weekly.csv"
+    },
+    {
+        "fips": "46121",
+        "name": "Todd County",
+        "label": "Rosebud",
+        "filename": "todd_drought_weekly.csv"
+    }
+]
+DEFAULT_PRECIP_FILENAME = "south_dakota_precipitation_daily.csv"
+
+def get_config():
+    config = {
+        "state": DEFAULT_STATE,
+        "state_name": DEFAULT_STATE_NAME,
+        "counties": DEFAULT_COUNTIES,
+        "precip_filename": DEFAULT_PRECIP_FILENAME
+    }
+    config_path = "config.csv"
+    if os.path.exists(config_path):
+        try:
+            df_cfg = pd.read_csv(config_path)
+            # Parse state
+            df_state = df_cfg[df_cfg["type"].str.lower().str.strip() == "state"]
+            if not df_state.empty:
+                row = df_state.iloc[0]
+                config["state"] = str(row["code"]).strip().lower()
+                config["state_name"] = str(row["name"]).strip()
+                # Dynamic precip filename for custom state
+                config["precip_filename"] = f"{config['state_name'].lower().replace(' ', '_')}_precipitation_daily.csv"
+            
+            # Parse counties
+            df_counties = df_cfg[df_cfg["type"].str.lower().str.strip() == "county"]
+            if not df_counties.empty:
+                counties_list = []
+                for _, row in df_counties.iterrows():
+                    fips = str(row["code"]).strip()
+                    name = str(row["name"]).strip()
+                    label = str(row["label"]).strip() if pd.notna(row["label"]) and str(row["label"]).strip() != "" else name
+                    # Dynamic filename for custom county
+                    filename = f"{name.lower().replace(' ', '_').replace('.', '')}_drought_weekly.csv"
+                    counties_list.append({
+                        "fips": fips,
+                        "name": name,
+                        "label": label,
+                        "filename": filename
+                    })
+                config["counties"] = counties_list
+        except Exception as e:
+            print(f"Warning: Failed to load config.csv ({e}). Using defaults.")
+    return config
+
+config = get_config()
+```
+
+```{python}
+#| label: introduction
+#| warning: false
+#| message: false
+#| output: asis
+
+from IPython.display import display, Markdown
+
+county_bullets = "".join([f"1. **Weekly Drought Monitor records** for {c['name']} (FIPS {c['fips']}), {config['state_name']}.\n" for c in config["counties"]])
+
+display(Markdown(f"""
 # Introduction
 
-This document contains Python code to programmatically retrieve, process, and store 10 years of historical data for:
-1. **Weekly Drought Monitor records** for Oglala Lakota County (FIPS 46102) and Todd County (FIPS 46121), South Dakota.
-2. **Daily Precipitation records** for the State of South Dakota (state-wide mean).
+This document contains Python code to programmatically retrieve, process, and store 10-year historical climate records for:
 
-The collected datasets are saved to the `data/` directory as:
-- `data/oglala_lakota_drought_weekly.csv`
-- `data/todd_drought_weekly.csv`
-- `data/south_dakota_precipitation_daily.csv`
+{county_bullets}
+2. **Daily Precipitation records** for the State of {config['state_name']} (state-wide mean).
 
----
+The collected datasets are saved to the `data/` directory.
+
+> [!NOTE]
+> **Active Region Configuration**: Default configured for **{config['state_name']}** (precipitation) and counties: {", ".join([f"{c['name']} ({c['label']})" for c in config['counties']])}.
+> To customize these locations, copy the layout from `config.csv.default` (or the example from `config.csv.example`) into a new `config.csv` file and re-run.
+"""))
+```
+
+
+***
 
 # Data Sources & Citations
 
@@ -41,7 +131,7 @@ The collected datasets are saved to the `data/` directory as:
    - **Citation**:
      > Applied Climate Information System (ACIS). (2026). *Gridded Daily Precipitation (NRCC Interpolated Grid)*. NOAA Regional Climate Centers. Retrieved from https://www.rcc-acis.org/
 
----
+***
 
 # Data Collection Pipeline
 
@@ -52,14 +142,14 @@ The following Python block dynamically computes the date range for the past 10 y
 #| warning: false
 #| message: false
 
-import os
-import io
 import datetime
 import requests
-import pandas as pd
 
-# Create target data directory
-os.makedirs("data", exist_ok=True)
+print(f"Active State: {config['state_name']} ({config['state']})")
+print("Active Counties:")
+for county in config["counties"]:
+    print(f"  - {county['name']} (FIPS: {county['fips']}, Label: {county['label']})")
+
 
 # Calculate dynamic dates for the past 10 years
 today = datetime.date.today()
@@ -72,15 +162,14 @@ except ValueError:
 start_date_str = start_date.strftime("%Y-%m-%d")
 end_date_str = today.strftime("%Y-%m-%d")
 
-print(f"Collection timeframe: {start_date_str} to {end_date_str}")
+print(f"\nCollection timeframe: {start_date_str} to {end_date_str}")
 
 # --- Task 1: Fetch U.S. Drought Monitor Data for Counties ---
-counties = {
-    "46102": ("Oglala Lakota County", "oglala_lakota_drought_weekly.csv"),
-    "46121": ("Todd County", "todd_drought_weekly.csv")
-}
-
-for fips_code, (county_name, filename) in counties.items():
+for county in config["counties"]:
+    fips_code = county["fips"]
+    county_name = county["name"]
+    filename = county["filename"]
+    
     usdm_url = (
         f"https://usdmdataservices.unl.edu/api/CountyStatistics/GetDroughtSeverityStatisticsByAreaPercent"
         f"?aoi={fips_code}&startdate={start_date_str}&enddate={end_date_str}&statisticsType=1"
@@ -97,10 +186,10 @@ for fips_code, (county_name, filename) in counties.items():
         print(f"-> Error fetching USDM data for {county_name}: {usdm_response.status_code}")
         print(usdm_response.text[:500])
 
-# --- Task 2: Fetch Daily Precipitation Records for South Dakota (State Mean) ---
+# --- Task 2: Fetch Daily Precipitation Records for State Mean ---
 acis_url = "https://data.rcc-acis.org/GridData"
 acis_payload = {
-    "state": "sd",
+    "state": config["state"],
     "sdate": start_date_str,
     "edate": end_date_str,
     "grid": "1",
@@ -115,8 +204,9 @@ if acis_response.status_code == 200:
     
     # Process the nested list format into a standard DataFrame
     processed = []
+    state_key = config["state"].upper()
     for date_val, val_dict in raw_records:
-        val = val_dict.get("SD") if isinstance(val_dict, dict) else None
+        val = val_dict.get(state_key) if isinstance(val_dict, dict) else None
         # Handle potential trace ('T') or missing ('M') string codes
         if val is None or val in ["M", "M ", " M", ""]:
             val_float = None
@@ -130,7 +220,7 @@ if acis_response.status_code == 200:
         processed.append({"date": date_val, "precipitation_inches": val_float})
         
     df_precip = pd.DataFrame(processed)
-    precip_path = os.path.join("data", "south_dakota_precipitation_daily.csv")
+    precip_path = os.path.join("data", config["precip_filename"])
     df_precip.to_csv(precip_path, index=False)
     print(f"-> Successfully saved daily precipitation data to {precip_path}")
 else:
@@ -138,82 +228,53 @@ else:
     print(acis_response.text[:500])
 ```
 
----
+***
 
 # Data Previews & Summaries
 
 Let's load the saved datasets to verify their content and print summary statistics.
 
-## U.S. Drought Monitor Data Summary (Oglala Lakota County)
-
 ```{python}
-#| label: usdm-summary-oglala
+#| label: usdm-summaries
 #| warning: false
+#| output: asis
 
-df_usdm = pd.read_csv("data/oglala_lakota_drought_weekly.csv")
+from IPython.display import display, Markdown
 
-# Clean dates and sort chronologically
-df_usdm["ValidStart"] = pd.to_datetime(df_usdm["ValidStart"])
-df_usdm["ValidEnd"] = pd.to_datetime(df_usdm["ValidEnd"])
-df_usdm = df_usdm.sort_values("ValidStart").reset_index(drop=True)
+for county in config["counties"]:
+    name = county["name"]
+    filename = county["filename"]
+    csv_path = os.path.join("data", filename)
+    
+    if os.path.exists(csv_path):
+        df_c = pd.read_csv(csv_path)
+        df_c["ValidStart"] = pd.to_datetime(df_c["ValidStart"])
+        df_c["ValidEnd"] = pd.to_datetime(df_c["ValidEnd"])
+        df_c = df_c.sort_values("ValidStart").reset_index(drop=True)
+        
+        display(Markdown(f"## U.S. Drought Monitor Data Summary ({name})"))
+        display(Markdown(f"**Weekly USDM records:** {len(df_c)}"))
+        display(df_c[["ValidStart", "County", "None", "D0", "D1", "D2", "D3", "D4"]].tail())
+        
+        display(Markdown(f"### {name} Drought Summary Stats"))
+        display(df_c[["None", "D0", "D1", "D2", "D3", "D4"]].describe())
+        display(Markdown("***"))
 
-print(f"Oglala Lakota County weekly USDM records: {len(df_usdm)}")
-df_usdm[["ValidStart", "County", "None", "D0", "D1", "D2", "D3", "D4"]].tail()
+precip_path = os.path.join("data", config["precip_filename"])
+if os.path.exists(precip_path):
+    df_precip = pd.read_csv(precip_path)
+    df_precip["date"] = pd.to_datetime(df_precip["date"])
+    df_precip = df_precip.sort_values("date").reset_index(drop=True)
+    
+    display(Markdown(f"## Daily Precipitation Data Summary ({config['state_name']})"))
+    display(Markdown(f"**Number of daily precipitation records:** {len(df_precip)}"))
+    display(df_precip.tail())
+    
+    display(Markdown(f"### Precipitation Summary Stats"))
+    display(df_precip["precipitation_inches"].describe())
 ```
 
-### Oglala Lakota Drought Summary Stats
-
-```{python}
-#| label: usdm-stats-oglala
-df_usdm[["None", "D0", "D1", "D2", "D3", "D4"]].describe()
-```
-
-## U.S. Drought Monitor Data Summary (Todd County)
-
-```{python}
-#| label: usdm-summary-todd
-#| warning: false
-
-df_todd = pd.read_csv("data/todd_drought_weekly.csv")
-
-# Clean dates and sort chronologically
-df_todd["ValidStart"] = pd.to_datetime(df_todd["ValidStart"])
-df_todd["ValidEnd"] = pd.to_datetime(df_todd["ValidEnd"])
-df_todd = df_todd.sort_values("ValidStart").reset_index(drop=True)
-
-print(f"Todd County weekly USDM records: {len(df_todd)}")
-df_todd[["ValidStart", "County", "None", "D0", "D1", "D2", "D3", "D4"]].tail()
-```
-
-### Todd County Drought Summary Stats
-
-```{python}
-#| label: usdm-stats-todd
-df_todd[["None", "D0", "D1", "D2", "D3", "D4"]].describe()
-```
-
-## Daily Precipitation Data Summary
-
-```{python}
-#| label: precip-summary
-#| warning: false
-
-df_precip = pd.read_csv("data/south_dakota_precipitation_daily.csv")
-df_precip["date"] = pd.to_datetime(df_precip["date"])
-df_precip = df_precip.sort_values("date").reset_index(drop=True)
-
-print(f"Number of daily precipitation records: {len(df_precip)}")
-df_precip.tail()
-```
-
-### Precipitation Summary Stats
-
-```{python}
-#| label: precip-stats
-df_precip["precipitation_inches"].describe()
-```
-
----
+***
 
 # Visualizations
 
@@ -228,43 +289,54 @@ Let's visualize the trends over the 10-year period.
 
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 
 sns.set_theme(style="whitegrid")
-fig, axes = plt.subplots(3, 1, figsize=(7.5, 9.5), sharex=False)
+num_counties = len(config["counties"])
+fig, axes = plt.subplots(num_counties + 1, 1, figsize=(7.5, 3.2 * (num_counties + 1)), sharex=False)
 
-# 1. Plot Weekly Drought Monitor Trends (Oglala Lakota County)
-axes[0].fill_between(df_usdm["ValidStart"], df_usdm["D0"], color="#ffff00", alpha=0.5, label="D0 (Abnormally Dry)")
-axes[0].fill_between(df_usdm["ValidStart"], df_usdm["D1"], color="#fcd37f", alpha=0.6, label="D1 (Moderate Drought)")
-axes[0].fill_between(df_usdm["ValidStart"], df_usdm["D2"], color="#ffaa00", alpha=0.7, label="D2 (Severe Drought)")
-axes[0].fill_between(df_usdm["ValidStart"], df_usdm["D3"], color="#e60000", alpha=0.8, label="D3 (Extreme Drought)")
-axes[0].fill_between(df_usdm["ValidStart"], df_usdm["D4"], color="#730000", alpha=0.9, label="D4 (Exceptional Drought)")
-axes[0].set_title("Weekly Drought Monitor Area Severity (%) - Oglala Lakota County", fontsize=12, fontweight="bold")
-axes[0].set_ylabel("Cumulative % Area affected", fontsize=10)
-axes[0].set_ylim(0, 100)
-axes[0].legend(loc="upper right", frameon=True, fontsize=8)
+# Standardize axes indexing if only 1 plot
+if num_counties + 1 == 1:
+    axes = [axes]
+elif not isinstance(axes, (list, np.ndarray)):
+    axes = [axes]
 
-# 2. Plot Weekly Drought Monitor Trends (Todd County)
-axes[1].fill_between(df_todd["ValidStart"], df_todd["D0"], color="#ffff00", alpha=0.5, label="D0 (Abnormally Dry)")
-axes[1].fill_between(df_todd["ValidStart"], df_todd["D1"], color="#fcd37f", alpha=0.6, label="D1 (Moderate Drought)")
-axes[1].fill_between(df_todd["ValidStart"], df_todd["D2"], color="#ffaa00", alpha=0.7, label="D2 (Severe Drought)")
-axes[1].fill_between(df_todd["ValidStart"], df_todd["D3"], color="#e60000", alpha=0.8, label="D3 (Extreme Drought)")
-axes[1].fill_between(df_todd["ValidStart"], df_todd["D4"], color="#730000", alpha=0.9, label="D4 (Exceptional Drought)")
-axes[1].set_title("Weekly Drought Monitor Area Severity (%) - Todd County", fontsize=12, fontweight="bold")
-axes[1].set_ylabel("Cumulative % Area affected", fontsize=10)
-axes[1].set_ylim(0, 100)
-axes[1].legend(loc="upper right", frameon=True, fontsize=8)
+for idx, county in enumerate(config["counties"]):
+    filename = county["filename"]
+    csv_path = os.path.join("data", filename)
+    if os.path.exists(csv_path):
+        df_c = pd.read_csv(csv_path)
+        df_c["ValidStart"] = pd.to_datetime(df_c["ValidStart"])
+        df_c = df_c.sort_values("ValidStart").reset_index(drop=True)
+        
+        ax = axes[idx]
+        ax.fill_between(df_c["ValidStart"], df_c["D0"], color="#ffff00", alpha=0.5, label="D0 (Abnormally Dry)")
+        ax.fill_between(df_c["ValidStart"], df_c["D1"], color="#fcd37f", alpha=0.6, label="D1 (Moderate Drought)")
+        ax.fill_between(df_c["ValidStart"], df_c["D2"], color="#ffaa00", alpha=0.7, label="D2 (Severe Drought)")
+        ax.fill_between(df_c["ValidStart"], df_c["D3"], color="#e60000", alpha=0.8, label="D3 (Extreme Drought)")
+        ax.fill_between(df_c["ValidStart"], df_c["D4"], color="#730000", alpha=0.9, label="D4 (Exceptional Drought)")
+        ax.set_title(f"Weekly Drought Monitor Area Severity (%) - {county['name']}", fontsize=11, fontweight="bold")
+        ax.set_ylabel("Cumulative % Area affected", fontsize=9)
+        ax.set_ylim(0, 100)
+        ax.legend(loc="upper right", frameon=True, fontsize=8)
 
-# 3. Plot Monthly Aggregated Precipitation (South Dakota Mean)
-df_precip["year_month"] = df_precip["date"].dt.to_period("M")
-df_monthly = df_precip.groupby("year_month")["precipitation_inches"].sum().reset_index()
-df_monthly["date_index"] = df_monthly["year_month"].dt.to_timestamp()
-
-axes[2].bar(df_monthly["date_index"], df_monthly["precipitation_inches"], width=25, color="#1f77b4", alpha=0.8)
-df_monthly["rolling_mean"] = df_monthly["precipitation_inches"].rolling(12, center=True).mean()
-axes[2].plot(df_monthly["date_index"], df_monthly["rolling_mean"], color="#d62728", linewidth=2.5, label="12-Month Rolling Mean")
-axes[2].set_title("South Dakota Monthly Total Precipitation (Statewide Average)", fontsize=12, fontweight="bold")
-axes[2].set_ylabel("Precipitation (inches)", fontsize=10)
-axes[2].legend(loc="upper right", frameon=True, fontsize=8)
+# Plot Monthly Aggregated Precipitation
+precip_path = os.path.join("data", config["precip_filename"])
+if os.path.exists(precip_path):
+    df_precip = pd.read_csv(precip_path)
+    df_precip["date"] = pd.to_datetime(df_precip["date"])
+    df_precip = df_precip.sort_values("date").reset_index(drop=True)
+    df_precip["year_month"] = df_precip["date"].dt.to_period("M")
+    df_monthly = df_precip.groupby("year_month")["precipitation_inches"].sum().reset_index()
+    df_monthly["date_index"] = df_monthly["year_month"].dt.to_timestamp()
+    
+    ax = axes[num_counties]
+    ax.bar(df_monthly["date_index"], df_monthly["precipitation_inches"], width=25, color="#1f77b4", alpha=0.8)
+    df_monthly["rolling_mean"] = df_monthly["precipitation_inches"].rolling(12, center=True).mean()
+    ax.plot(df_monthly["date_index"], df_monthly["rolling_mean"], color="#d62728", linewidth=2.2, label="12-Month Rolling Mean")
+    ax.set_title(f"{config['state_name']} Monthly Total Precipitation (Statewide Average)", fontsize=11, fontweight="bold")
+    ax.set_ylabel("Precipitation (inches)", fontsize=9)
+    ax.legend(loc="upper right", frameon=True, fontsize=8)
 
 plt.tight_layout()
 plt.show()

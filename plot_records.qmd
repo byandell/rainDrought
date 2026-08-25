@@ -1,6 +1,6 @@
 ---
 title: "Visualizing Climate Records using Plotly"
-subtitle: "10-Year Interactive Drought and Precipitation Analysis for South Dakota, Pine Ridge, and Rosebud"
+subtitle: "10-Year Interactive Drought and Precipitation Analysis"
 author: "Antigravity Coding Assistant"
 date: "2026-07-19"
 format:
@@ -12,18 +12,106 @@ format:
     embed-resources: true
 ---
 
+```{python}
+#| label: config-init
+#| warning: false
+#| message: false
+
+import os
+import pandas as pd
+
+# Helper to read configuration with defaults
+DEFAULT_STATE = "sd"
+DEFAULT_STATE_NAME = "South Dakota"
+DEFAULT_COUNTIES = [
+    {
+        "fips": "46102",
+        "name": "Oglala Lakota County",
+        "label": "Pine Ridge",
+        "filename": "oglala_lakota_drought_weekly.csv"
+    },
+    {
+        "fips": "46121",
+        "name": "Todd County",
+        "label": "Rosebud",
+        "filename": "todd_drought_weekly.csv"
+    }
+]
+DEFAULT_PRECIP_FILENAME = "south_dakota_precipitation_daily.csv"
+
+def get_config():
+    config = {
+        "state": DEFAULT_STATE,
+        "state_name": DEFAULT_STATE_NAME,
+        "counties": DEFAULT_COUNTIES,
+        "precip_filename": DEFAULT_PRECIP_FILENAME
+    }
+    config_path = "config.csv"
+    if os.path.exists(config_path):
+        try:
+            df_cfg = pd.read_csv(config_path)
+            # Parse state
+            df_state = df_cfg[df_cfg["type"].str.lower().str.strip() == "state"]
+            if not df_state.empty:
+                row = df_state.iloc[0]
+                config["state"] = str(row["code"]).strip().lower()
+                config["state_name"] = str(row["name"]).strip()
+                # Dynamic precip filename for custom state
+                config["precip_filename"] = f"{config['state_name'].lower().replace(' ', '_')}_precipitation_daily.csv"
+            
+            # Parse counties
+            df_counties = df_cfg[df_cfg["type"].str.lower().str.strip() == "county"]
+            if not df_counties.empty:
+                counties_list = []
+                for _, row in df_counties.iterrows():
+                    fips = str(row["code"]).strip()
+                    name = str(row["name"]).strip()
+                    label = str(row["label"]).strip() if pd.notna(row["label"]) and str(row["label"]).strip() != "" else name
+                    # Dynamic filename for custom county
+                    filename = f"{name.lower().replace(' ', '_').replace('.', '')}_drought_weekly.csv"
+                    counties_list.append({
+                        "fips": fips,
+                        "name": name,
+                        "label": label,
+                        "filename": filename
+                    })
+                config["counties"] = counties_list
+        except Exception as e:
+            print(f"Warning: Failed to load config.csv ({e}). Using defaults.")
+    return config
+
+config = get_config()
+```
+
+```{python}
+#| label: introduction
+#| warning: false
+#| message: false
+#| output: asis
+
+from IPython.display import display, Markdown
+
+county_names_str = " and ".join([c["name"] for c in config["counties"]])
+county_labels_str = " and ".join([c["label"] for c in config["counties"]])
+
+display(Markdown(f"""
 # Introduction
 
-In this document, we visualize the weekly drought records for Oglala Lakota County and Todd County alongside the daily precipitation records for South Dakota using Python's **[Plotly](https://plotly.com/python/)** library, providing interactive and responsive dashboards.
-These counties correspond to part of the Pine Ridge and Rosebud reservations
-and are labeled as such in plots.
+In this document, we visualize the weekly drought records for {county_names_str} alongside daily precipitation records for {config['state_name']} using Python's **[Plotly](https://plotly.com/python/)** library, providing interactive and responsive dashboards.
 
 We will display:
-1. Both county drought datasets and the statewide rolling precipitation plotted over time (10-year timeline).
-2. Time within the year (standardized month, X-axis) vs. annual cumulative values (Y-axis) for cumulative precipitation and the two counties' cumulative drought indices.
+1. County drought datasets ({county_labels_str}) and the statewide rolling precipitation plotted over time (10-year timeline).
+2. Time within the year (standardized month, X-axis) vs. annual cumulative values (Y-axis) for cumulative precipitation and county cumulative drought indices.
 3. Annual trajectories comparing cumulative precipitation (X-axis) vs. cumulative drought index (Y-axis) faceted side-by-side by county.
 
----
+> [!NOTE]
+> **Active Region Configuration**: Currently configured for **{config['state_name']}** (precipitation) and counties: {", ".join([f"{c['name']} ({c['label']})" for c in config['counties']])}.
+> To customize these locations, copy the layout from `config.csv.default` (or the example from `config.csv.example`) into a new `config.csv` file and re-run.
+"""))
+```
+
+
+***
 
 # Data Processing & Alignment
 
@@ -40,58 +128,50 @@ First, we load the collected datasets, calculate the **Drought Severity and Cove
 import pandas as pd
 import numpy as np
 
-# Load local CSV files
-df_usdm = pd.read_csv("data/oglala_lakota_drought_weekly.csv")
-df_todd = pd.read_csv("data/todd_drought_weekly.csv")
-df_precip = pd.read_csv("data/south_dakota_precipitation_daily.csv")
-
-# Parse dates
-df_usdm["date"] = pd.to_datetime(df_usdm["ValidStart"])
-df_todd["date"] = pd.to_datetime(df_todd["ValidStart"])
+# Load precipitation daily data
+precip_path = os.path.join("data", config["precip_filename"])
+df_precip = pd.read_csv(precip_path)
 df_precip["date"] = pd.to_datetime(df_precip["date"])
-
-# --- Pine Ridge Preprocessing ---
-df_usdm["dsci"] = df_usdm["D0"] + df_usdm["D1"] + df_usdm["D2"] + df_usdm["D3"] + df_usdm["D4"]
-df_usdm["year"] = df_usdm["date"].dt.year
-df_usdm = df_usdm.sort_values("date")
-df_usdm["cumulative_dsci_year"] = df_usdm.groupby("year")["dsci"].cumsum()
-
-# --- Rosebud Preprocessing ---
-df_todd["dsci"] = df_todd["D0"] + df_todd["D1"] + df_todd["D2"] + df_todd["D3"] + df_todd["D4"]
-df_todd["year"] = df_todd["date"].dt.year
-df_todd = df_todd.sort_values("date")
-df_todd["cumulative_dsci_year"] = df_todd.groupby("year")["dsci"].cumsum()
-
-# --- South Dakota Precipitation Preprocessing ---
 df_precip = df_precip.sort_values("date").reset_index(drop=True)
 df_precip["cumulative_rain"] = df_precip["precipitation_inches"].cumsum()
 df_precip["year"] = df_precip["date"].dt.year
 df_precip["cumulative_rain_year"] = df_precip.groupby("year")["precipitation_inches"].cumsum()
 df_precip["rolling_365d_rain"] = df_precip["precipitation_inches"].rolling(window=365, min_periods=1).sum()
 
-# --- Merges ---
-df_merged_oglala = pd.merge(
-    df_usdm[["date", "year", "dsci", "cumulative_dsci_year"]], 
-    df_precip[["date", "precipitation_inches", "cumulative_rain_year", "rolling_365d_rain"]], 
-    on="date", 
-    how="inner"
-).sort_values("date").reset_index(drop=True)
-df_merged_oglala["year_str"] = df_merged_oglala["year"].astype(str)
-df_merged_oglala["day_in_year"] = pd.to_datetime(df_merged_oglala["date"].dt.strftime("2020-%m-%d"))
+# Load and process each county's data
+county_dfs = {}
+merged_dfs = {}
+for county in config["counties"]:
+    fips = county["fips"]
+    name = county["name"]
+    filename = county["filename"]
+    csv_path = os.path.join("data", filename)
+    
+    df_c = pd.read_csv(csv_path)
+    df_c["date"] = pd.to_datetime(df_c["ValidStart"])
+    df_c["dsci"] = df_c["D0"] + df_c["D1"] + df_c["D2"] + df_c["D3"] + df_c["D4"]
+    df_c["year"] = df_c["date"].dt.year
+    df_c = df_c.sort_values("date")
+    df_c["cumulative_dsci_year"] = df_c.groupby("year")["dsci"].cumsum()
+    county_dfs[fips] = df_c
+    
+    # Merge with precipitation
+    df_merged = pd.merge(
+        df_c[["date", "year", "dsci", "cumulative_dsci_year"]], 
+        df_precip[["date", "precipitation_inches", "cumulative_rain_year", "rolling_365d_rain"]], 
+        on="date", 
+        how="inner"
+    ).sort_values("date").reset_index(drop=True)
+    df_merged["year_str"] = df_merged["year"].astype(str)
+    df_merged["day_in_year"] = pd.to_datetime(df_merged["date"].dt.strftime("2020-%m-%d"))
+    merged_dfs[fips] = df_merged
 
-df_merged_todd = pd.merge(
-    df_todd[["date", "year", "dsci", "cumulative_dsci_year"]], 
-    df_precip[["date", "precipitation_inches", "cumulative_rain_year", "rolling_365d_rain"]], 
-    on="date", 
-    how="inner"
-).sort_values("date").reset_index(drop=True)
-df_merged_todd["year_str"] = df_merged_todd["year"].astype(str)
-df_merged_todd["day_in_year"] = pd.to_datetime(df_merged_todd["date"].dt.strftime("2020-%m-%d"))
-
-df_merged_oglala.head()
+# Print preview of the first county's merged data
+first_fips = config["counties"][0]["fips"]
+merged_dfs[first_fips].head()
 ```
 
----
+***
 
 # Interactive Visualizations with Plotly
 
@@ -107,52 +187,62 @@ This faceted timeline displays the 10-year history of the weekly drought index (
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 
+num_counties = len(config["counties"])
+subplot_titles = [f"DSCI - {c['label']}" for c in config["counties"]] + [
+    f"365-Day Rolling Precipitation (inches) [{config['state_name']} Mean]"
+]
+
 fig_time = make_subplots(
-    rows=3, cols=1, 
+    rows=num_counties + 1, cols=1, 
     shared_xaxes=True, 
     vertical_spacing=0.06,
-    subplot_titles=(
-        "DSCI - Pine Ridge", 
-        "DSCI - Rosebud", 
-        "365-Day Rolling Precipitation (inches) [South Dakota Mean]"
+    subplot_titles=subplot_titles
+)
+
+# Plot each county
+colors_palette = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b"]
+for idx, county in enumerate(config["counties"]):
+    fips = county["fips"]
+    label = county["label"]
+    df_merged = merged_dfs[fips]
+    color = colors_palette[idx % len(colors_palette)]
+    
+    fig_time.add_trace(
+        go.Scatter(
+            x=df_merged["date"], 
+            y=df_merged["dsci"], 
+            name=f"{label} DSCI", 
+            line=dict(color=color, width=1.5)
+        ), 
+        row=idx+1, col=1
     )
-)
 
-# Pine Ridge
+# Plot precipitation
+first_fips = config["counties"][0]["fips"]
+df_first = merged_dfs[first_fips]
 fig_time.add_trace(
     go.Scatter(
-        x=df_merged_oglala["date"], 
-        y=df_merged_oglala["dsci"], 
-        name="Pine Ridge DSCI", 
-        line=dict(color="#1f77b4", width=1.5)
-    ), 
-    row=1, col=1
-)
-
-# Rosebud
-fig_time.add_trace(
-    go.Scatter(
-        x=df_merged_todd["date"], 
-        y=df_merged_todd["dsci"], 
-        name="Rosebud DSCI", 
-        line=dict(color="#ff7f0e", width=1.5)
-    ), 
-    row=2, col=1
-)
-
-# South Dakota rolling precipitation
-fig_time.add_trace(
-    go.Scatter(
-        x=df_merged_oglala["date"], 
-        y=df_merged_oglala["rolling_365d_rain"], 
+        x=df_first["date"], 
+        y=df_first["rolling_365d_rain"], 
         name="365-Day Rolling Precip", 
         line=dict(color="#2ca02c", width=1.5)
     ), 
-    row=3, col=1
+    row=num_counties + 1, col=1
 )
 
+# Custom dynamic heights: e.g., 220px per county + 210px for precip
+fig_height = 220 * num_counties + 210
+
+# Generate dynamic axis reset parameters
+reset_args = {
+    f"xaxis{i if i > 1 else ''}.autorange": True for i in range(1, num_counties + 2)
+}
+reset_args.update({
+    f"yaxis{i if i > 1 else ''}.autorange": True for i in range(1, num_counties + 2)
+})
+
 fig_time.update_layout(
-    height=650, 
+    height=fig_height, 
     template="plotly_white", 
     title=dict(
         text="10-Year Climate Metrics Over Time",
@@ -176,12 +266,7 @@ fig_time.update_layout(
                 dict(
                     label="Reset View",
                     method="relayout",
-                    args=[{
-                        "xaxis.autorange": True,
-                        "yaxis.autorange": True,
-                        "yaxis2.autorange": True,
-                        "yaxis3.autorange": True
-                    }]
+                    args=[reset_args]
                 )
             ]
         )
@@ -190,7 +275,7 @@ fig_time.update_layout(
 fig_time.show()
 ```
 
----
+***
 
 ## 2. Visualizing Annual Cumulative Progression Over the Year (Time vs. Cumulative Values)
 
@@ -211,32 +296,37 @@ Each year is shown as a separate colored curve in a rainbow series, with open ci
 import plotly.express as px
 
 # Identify colors for each year in a rainbow series (turbo colorscale)
-years = sorted(df_merged_oglala["year_str"].unique())
+first_fips = config["counties"][0]["fips"]
+df_first = merged_dfs[first_fips]
+years = sorted(df_first["year_str"].unique())
 colors = px.colors.sample_colorscale("turbo", [i / (len(years) - 1) for i in range(len(years))])
 year_colors = dict(zip(years, colors))
 
+num_counties = len(config["counties"])
+subplot_titles = [f"Cumulative Precipitation ({config['state_name']} Mean)"] + [
+    f"Cumulative Drought Index ({c['label']})" for c in config["counties"]
+]
+
 fig_cum_time = make_subplots(
-    rows=3, cols=1, 
+    rows=num_counties + 1, cols=1, 
     shared_xaxes=True, 
     vertical_spacing=0.06,
-    subplot_titles=(
-        "Cumulative Precipitation (South Dakota Mean)", 
-        "Cumulative Drought Index (Pine Ridge)", 
-        "Cumulative Drought Index (Rosebud)"
-    )
+    subplot_titles=subplot_titles
 )
 
-# Identify month-end markers
-df_month_ends_oglala = df_merged_oglala.groupby(["year", df_merged_oglala["date"].dt.month]).tail(1).copy()
-df_month_ends_oglala["day_in_year"] = pd.to_datetime(df_month_ends_oglala["date"].dt.strftime("2020-%m-%d"))
-
-df_month_ends_todd = df_merged_todd.groupby(["year", df_merged_todd["date"].dt.month]).tail(1).copy()
-df_month_ends_todd["day_in_year"] = pd.to_datetime(df_month_ends_todd["date"].dt.strftime("2020-%m-%d"))
+# Identify month-end markers for each county
+month_ends_dfs = {}
+for county in config["counties"]:
+    fips = county["fips"]
+    df_merged = merged_dfs[fips]
+    df_month_ends = df_merged.groupby(["year", df_merged["date"].dt.month]).tail(1).copy()
+    df_month_ends["day_in_year"] = pd.to_datetime(df_month_ends["date"].dt.strftime("2020-%m-%d"))
+    month_ends_dfs[fips] = df_month_ends
 
 for year in years:
-    # 1. Cumulative Precipitation
-    df_y_p = df_merged_oglala[df_merged_oglala["year_str"] == year]
-    df_pts_p = df_month_ends_oglala[df_month_ends_oglala["year_str"] == year]
+    # 1. Cumulative Precipitation (row 1)
+    df_y_p = df_first[df_first["year_str"] == year]
+    df_pts_p = month_ends_dfs[first_fips][month_ends_dfs[first_fips]["year_str"] == year]
     
     fig_cum_time.add_trace(
         go.Scatter(
@@ -255,63 +345,51 @@ for year in years:
         row=1, col=1
     )
     
-    # 2. Pine Ridge DSCI
-    df_y_o = df_merged_oglala[df_merged_oglala["year_str"] == year]
-    df_pts_o = df_month_ends_oglala[df_month_ends_oglala["year_str"] == year]
-    
-    fig_cum_time.add_trace(
-        go.Scatter(
-            x=df_y_o["day_in_year"], y=df_y_o["cumulative_dsci_year"], 
-            mode="lines", line=dict(color=year_colors[year]), 
-            name=year, legendgroup=year, showlegend=False
-        ), 
-        row=2, col=1
-    )
-    fig_cum_time.add_trace(
-        go.Scatter(
-            x=df_pts_o["day_in_year"], y=df_pts_o["cumulative_dsci_year"], 
-            mode="markers", marker=dict(symbol="circle-open", size=5, color=year_colors[year], line=dict(width=1)), 
-            name=year, legendgroup=year, showlegend=False
-        ), 
-        row=2, col=1
-    )
-    
-    # 3. Rosebud DSCI
-    df_y_t = df_merged_todd[df_merged_todd["year_str"] == year]
-    df_pts_t = df_month_ends_todd[df_month_ends_todd["year_str"] == year]
-    
-    fig_cum_time.add_trace(
-        go.Scatter(
-            x=df_y_t["day_in_year"], y=df_y_t["cumulative_dsci_year"], 
-            mode="lines", line=dict(color=year_colors[year]), 
-            name=year, legendgroup=year, showlegend=False
-        ), 
-        row=3, col=1
-    )
-    fig_cum_time.add_trace(
-        go.Scatter(
-            x=df_pts_t["day_in_year"], y=df_pts_t["cumulative_dsci_year"], 
-            mode="markers", marker=dict(symbol="circle-open", size=5, color=year_colors[year], line=dict(width=1)), 
-            name=year, legendgroup=year, showlegend=False
-        ), 
-        row=3, col=1
-    )
+    # 2..N+1. Counties DSCI
+    for idx, county in enumerate(config["counties"]):
+        fips = county["fips"]
+        df_y_c = merged_dfs[fips][merged_dfs[fips]["year_str"] == year]
+        df_pts_c = month_ends_dfs[fips][month_ends_dfs[fips]["year_str"] == year]
+        
+        fig_cum_time.add_trace(
+            go.Scatter(
+                x=df_y_c["day_in_year"], y=df_y_c["cumulative_dsci_year"], 
+                mode="lines", line=dict(color=year_colors[year]), 
+                name=year, legendgroup=year, showlegend=False
+            ), 
+            row=idx+2, col=1
+        )
+        fig_cum_time.add_trace(
+            go.Scatter(
+                x=df_pts_c["day_in_year"], y=df_pts_c["cumulative_dsci_year"], 
+                mode="markers", marker=dict(symbol="circle-open", size=5, color=year_colors[year], line=dict(width=1)), 
+                name=year, legendgroup=year, showlegend=False
+            ), 
+            row=idx+2, col=1
+        )
 
+# Custom dynamic heights: e.g., 290px for precip + 295px per county
+fig_height = 290 + 295 * num_counties
+
+# Generate dynamic axis reset parameters
+reset_args = {
+    f"xaxis{i if i > 1 else ''}.autorange": True for i in range(1, num_counties + 2)
+}
+reset_args.update({
+    f"yaxis{i if i > 1 else ''}.autorange": True for i in range(1, num_counties + 2)
+})
 
 fig_cum_time.update_layout(
-    height = 880,
-    template = "plotly_white",
-    title = dict(
-        text = "Annual Progression of Cumulative Climate Metrics",
-        y = 0.95, x = 0.5, xanchor = "center", yanchor = "top"
+    height=fig_height,
+    template="plotly_white",
+    title=dict(
+        text="Annual Progression of Cumulative Climate Metrics",
+        y=0.96, x=0.5, xanchor="center", yanchor="top"
     ),
-    margin = dict(t = 90),
-    legend = dict(
-        # groupclick="togglegroup",  <-- You can replace or keep this, but the below are safer for multi-subplots
-        # itemclick = "toggle3",         # Single-click toggles the entire group
-        # itemdoubleclick = "isolate3",  # Double-click isolates the entire group
-        groupclick="togglegroup",        # Natively validated to handle groups on double-click
-        title_text = "Year"
+    margin=dict(t=90),
+    legend=dict(
+        groupclick="togglegroup",
+        title_text="Year"
     ),
     updatemenus=[
         dict(
@@ -328,12 +406,7 @@ fig_cum_time.update_layout(
                     method="update",
                     args=[
                         {"visible": [True] * len(fig_cum_time.data)},
-                        {
-                            "xaxis.autorange": True,
-                            "yaxis.autorange": True,
-                            "yaxis2.autorange": True,
-                            "yaxis3.autorange": True
-                        }
+                        reset_args
                     ]
                 )
             ]
@@ -345,7 +418,7 @@ fig_cum_time.update_xaxes(tickformat="%b", dtick="M1")
 fig_cum_time.show()
 ```
 
----
+***
 
 ## 3. Visualizing Trajectories of Cumulative Rain vs. Cumulative Drought Index (Faceted by County)
 
@@ -366,95 +439,66 @@ The curves for Pine Ridge and Rosebud are displayed side-by-side as two facets o
 #| warning: false
 #| message: false
 
+num_counties = len(config["counties"])
+subplot_titles = [county["label"] for county in config["counties"]]
+
 fig_combined_annual = make_subplots(
-    rows=1, cols=2, 
+    rows=1, cols=num_counties, 
     shared_yaxes=True, 
     horizontal_spacing=0.08,
-    subplot_titles=("Pine Ridge", "Rosebud")
+    subplot_titles=subplot_titles
 )
-
-# Identify month-end markers for Rosebud
-df_month_ends_todd = df_merged_todd.groupby(["year", df_merged_todd["date"].dt.month]).tail(1).copy()
 
 for year in years:
-    # 1. Pine Ridge
-    df_y_o = df_merged_oglala[df_merged_oglala["year_str"] == year]
-    df_pts_o = df_month_ends_oglala[df_month_ends_oglala["year_str"] == year]
-    
-    fig_combined_annual.add_trace(
-        go.Scatter(
-            x=df_y_o["cumulative_rain_year"], y=df_y_o["cumulative_dsci_year"], 
-            mode="lines", line=dict(color=year_colors[year]), 
-            name=year, legendgroup=year, showlegend=True
-        ), 
-        row=1, col=1
-    )
-    fig_combined_annual.add_trace(
-        go.Scatter(
-            x=df_pts_o["cumulative_rain_year"], y=df_pts_o["cumulative_dsci_year"], 
-            mode="markers", marker=dict(symbol="circle-open", size=5, color=year_colors[year], line=dict(width=1)), 
-            name=year, legendgroup=year, showlegend=False
-        ), 
-        row=1, col=1
-    )
-
-    # 2. Rosebud
-    df_y_t = df_merged_todd[df_merged_todd["year_str"] == year]
-    df_pts_t = df_month_ends_todd[df_month_ends_todd["year_str"] == year]
-    
-    fig_combined_annual.add_trace(
-        go.Scatter(
-            x=df_y_t["cumulative_rain_year"], y=df_y_t["cumulative_dsci_year"], 
-            mode="lines", line=dict(color=year_colors[year]), 
-            name=year, legendgroup=year, showlegend=False
-        ), 
-        row=1, col=2
-    )
-    fig_combined_annual.add_trace(
-        go.Scatter(
-            x=df_pts_t["cumulative_rain_year"], y=df_pts_t["cumulative_dsci_year"], 
-            mode="markers", marker=dict(symbol="circle-open", size=5, color=year_colors[year], line=dict(width=1)), 
-            name=year, legendgroup=year, showlegend=False
-        ), 
-        row=1, col=2
-    )
+    for idx, county in enumerate(config["counties"]):
+        fips = county["fips"]
+        df_y_c = merged_dfs[fips][merged_dfs[fips]["year_str"] == year]
+        df_pts_c = month_ends_dfs[fips][month_ends_dfs[fips]["year_str"] == year]
+        
+        fig_combined_annual.add_trace(
+            go.Scatter(
+                x=df_y_c["cumulative_rain_year"], y=df_y_c["cumulative_dsci_year"], 
+                mode="lines", line=dict(color=year_colors[year]), 
+                name=year, legendgroup=year, showlegend=(idx == 0)
+            ), 
+            row=1, col=idx+1
+        )
+        fig_combined_annual.add_trace(
+            go.Scatter(
+                x=df_pts_c["cumulative_rain_year"], y=df_pts_c["cumulative_dsci_year"], 
+                mode="markers", marker=dict(symbol="circle-open", size=5, color=year_colors[year], line=dict(width=1)), 
+                name=year, legendgroup=year, showlegend=False
+            ), 
+            row=1, col=idx+1
+        )
 
 # Add background watermark text annotations for DRY and WET zones
-# Subplot 1 (Pine Ridge)
-fig_combined_annual.add_annotation(
-    xref="x domain", yref="y domain",
-    x=0.15, y=0.85,
-    text="<b>DRY</b>",
-    showarrow=False,
-    font=dict(size=40, color="rgba(150, 150, 150, 0.2)"),
-    textangle=-30
-)
-fig_combined_annual.add_annotation(
-    xref="x domain", yref="y domain",
-    x=0.85, y=0.15,
-    text="<b>WET</b>",
-    showarrow=False,
-    font=dict(size=40, color="rgba(150, 150, 150, 0.2)"),
-    textangle=-30
-)
+for idx in range(num_counties):
+    col_str = str(idx + 1) if idx > 0 else ""
+    fig_combined_annual.add_annotation(
+        xref=f"x{col_str} domain", yref=f"y{col_str} domain",
+        x=0.15, y=0.85,
+        text="<b>DRY</b>",
+        showarrow=False,
+        font=dict(size=40, color="rgba(150, 150, 150, 0.2)"),
+        textangle=-30
+    )
+    fig_combined_annual.add_annotation(
+        xref=f"x{col_str} domain", yref=f"y{col_str} domain",
+        x=0.85, y=0.15,
+        text="<b>WET</b>",
+        showarrow=False,
+        font=dict(size=40, color="rgba(150, 150, 150, 0.2)"),
+        textangle=-30
+    )
 
-# Subplot 2 (Rosebud)
-fig_combined_annual.add_annotation(
-    xref="x2 domain", yref="y2 domain",
-    x=0.15, y=0.85,
-    text="<b>DRY</b>",
-    showarrow=False,
-    font=dict(size=40, color="rgba(150, 150, 150, 0.2)"),
-    textangle=-30
-)
-fig_combined_annual.add_annotation(
-    xref="x2 domain", yref="y2 domain",
-    x=0.85, y=0.15,
-    text="<b>WET</b>",
-    showarrow=False,
-    font=dict(size=40, color="rgba(150, 150, 150, 0.2)"),
-    textangle=-30
-)
+# Dynamic reset params for horizontal subplots
+reset_args = {
+    f"xaxis{i if i > 1 else ''}.autorange": True for i in range(1, num_counties + 1)
+}
+reset_args.update({
+    f"yaxis{i if i > 1 else ''}.autorange": True for i in range(1, num_counties + 1)
+})
 
 fig_combined_annual.update_layout(
     height=480, 
@@ -467,12 +511,9 @@ fig_combined_annual.update_layout(
         yanchor="top"
     ),
     margin=dict(t=65),
-    legend = dict(
-        # groupclick="togglegroup",  <-- You can replace or keep this, but the below are safer for multi-subplots
-        # itemclick = "toggle3",         # Single-click toggles the entire group
-        # itemdoubleclick = "isolate3",  # Double-click isolates the entire group
-        groupclick="togglegroup",        # Natively validated to handle groups on double-click
-        title_text = "Year"
+    legend=dict(
+        groupclick="togglegroup",
+        title_text="Year"
     ),
     updatemenus=[
         dict(
@@ -489,19 +530,14 @@ fig_combined_annual.update_layout(
                     method="update",
                     args=[
                         {"visible": [True] * len(fig_combined_annual.data)},
-                        {
-                            "xaxis.autorange": True,
-                            "yaxis.autorange": True,
-                            "xaxis2.autorange": True,
-                            "yaxis2.autorange": True
-                        }
+                        reset_args
                     ]
                 )
             ]
         )
     ]
 )
-# Format the x-axes
+# Format the axes
 fig_combined_annual.update_xaxes(title_text="Cumulative Precipitation (inches)")
 fig_combined_annual.update_yaxes(title_text="Cumulative DSCI", row=1, col=1)
 fig_combined_annual.show()

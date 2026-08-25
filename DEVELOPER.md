@@ -2,7 +2,7 @@
 
 Welcome to the Developer Documentation for the South Dakota Rain and Drought Analysis project. This guide provides technical onboarding, architectural details, data pipeline schema description, and local build instructions.
 
----
+***
 
 ## 1. Project Directory & Architecture
 
@@ -26,7 +26,7 @@ The site is compiled into the **[`docs/`](docs/)** directory:
 > [!IMPORTANT]
 > The directory `docs/site_libs/` is ignored via [`.gitignore`](.gitignore) because all pages are compiled as standalone HTML documents with assets embedded natively. Do not stage or commit files inside `docs/site_libs/`.
 
----
+***
 
 ## 2. Local Environment Setup
 
@@ -51,7 +51,41 @@ To install or update dependencies in the environment, run:
 /users/brianyandell/miniconda3/envs/earth-analytics-python/bin/python -m pip install pandas requests plotly matplotlib seaborn
 ```
 
----
+
+***
+
+## 2.5. Location Configuration (`config.csv`)
+
+By default, the project processes data for South Dakota, Oglala Lakota County, and Todd County. You can customize the state and counties analyzed by creating a `config.csv` file in the root of the repository.
+
+### Configuration Templates
+The repository includes two pre-configured CSV templates:
+- **[`config.csv.default`](config.csv.default)**: The default configuration (South Dakota, Pine Ridge, Rosebud) used for the live site.
+- **[`config.csv.example`](config.csv.example)**: An example configuration (Nebraska, Lancaster County) showing custom region setups.
+
+To set up a custom analysis, copy either of these templates to a new `config.csv` file in the root directory:
+```bash
+cp config.csv.default config.csv
+# or
+cp config.csv.example config.csv
+```
+
+
+### Schema Parameters
+- **`type`**: Row type, either `state` or `county`.
+- **`code`**: The lowercase state abbreviation (e.g. `ne`) or the FIPS county code (e.g. `31107`).
+- **`name`**: Full official name of the state or county.
+- **`label`**: Short label for plots and legends (e.g. `Rosebud` or `Lancaster`).
+
+### Output Naming Convention
+- **Default state**: `data/south_dakota_precipitation_daily.csv`
+- **Custom state**: `data/{state_name_lower}_precipitation_daily.csv`
+- **Default counties**: `data/oglala_lakota_drought_weekly.csv`, `data/todd_drought_weekly.csv`
+- **Custom counties**: `data/{county_name_lower}_drought_weekly.csv`
+
+The file `config.csv` is ignored in Git to prevent local region settings from overriding the default South Dakota pages deployed to GitHub Pages.
+
+***
 
 ## 3. Data Pipeline & Endpoints
 
@@ -80,7 +114,7 @@ Data collection is automated within [`collect_data.qmd`](collect_data.qmd). When
 - **Output**:
   - [`data/south_dakota_precipitation_daily.csv`](data/south_dakota_precipitation_daily.csv)
 
----
+***
 
 ## 4. Data Processing Standards & Formulas
 
@@ -100,7 +134,7 @@ To evaluate annual progressions:
 - Group records by year (`date.dt.year`).
 - Compute cumulative sums (`cumsum()`) for precipitation and DSCI values starting January 1st of each year.
 
----
+***
 
 ## 5. Visualizations & Plotly Controls
 
@@ -133,7 +167,7 @@ updatemenus=[
 ]
 ```
 
----
+***
 
 ## 6. Local Build & Deployment
 

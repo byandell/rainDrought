@@ -1,14 +1,14 @@
 ---
-title: "South Dakota Rain and Drought Dashboard"
-subtitle: "10-Year Climate Analysis for Oglala Lakota and Todd Counties"
+title: "Rain and Drought Dashboard"
+subtitle: "10-Year Climate Analysis for Selected Counties"
 author: "Antigravity Coding Assistant"
 date: "2026-07-20"
 ---
 
 # Project Overview
 
-Welcome to the **South Dakota Rain and Drought Analysis Project**. This project collects, aligns, and visualizes 10 years of daily precipitation records for the state of South Dakota and weekly U.S. Drought Monitor data for Oglala Lakota County and Todd County.
-These counties correspond to part of the Pine Ridge and Rosebud reservations
+Welcome to the **Rain and Drought Analysis Project**. This project collects, aligns, and visualizes 10 years of daily precipitation records for a state (default South Dakota) and weekly U.S. Drought Monitor data for specified counties (default Oglala Lakota County and Todd County).
+These default counties correspond to part of the Pine Ridge and Rosebud reservations
 and are labeled as such in plots.
 
 > [!NOTE]
@@ -22,9 +22,12 @@ and are labeled as such in plots.
 
 # Data Sources & Repositories
 
-We track precipitation and drought severity metrics through several authoritative repositories:
+We track precipitation and drought severity metrics through several authoritative repositories.
+Default data sources shown below are replaced with data for other counties or states by modifying `config.csv`. (See
+[Rain and Drought Records Collection](collect_data.html) for more details).
 
 ### 1. Weekly & Monthly Drought Tracking
+
 - **County Conditions dashboards (Drought.gov)**:
   - [Oglala Lakota County Conditions](https://www.drought.gov/states/south-dakota/county/oglala%20lakota)
   - [Todd County Conditions](https://www.drought.gov/states/south-dakota/county/todd)

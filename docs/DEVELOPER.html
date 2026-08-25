@@ -4941,6 +4941,12 @@ window.Quarto = {
   <li><a href="#target-executable" id="toc-target-executable" class="nav-link" data-scroll-target="#target-executable">Target Executable</a></li>
   <li><a href="#dependencies" id="toc-dependencies" class="nav-link" data-scroll-target="#dependencies">Dependencies</a></li>
   </ul></li>
+  <li><a href="#location-configuration-config.csv" id="toc-location-configuration-config.csv" class="nav-link" data-scroll-target="#location-configuration-config.csv">2.5. Location Configuration (<code>config.csv</code>)</a>
+  <ul class="collapse">
+  <li><a href="#configuration-templates" id="toc-configuration-templates" class="nav-link" data-scroll-target="#configuration-templates">Configuration Templates</a></li>
+  <li><a href="#schema-parameters" id="toc-schema-parameters" class="nav-link" data-scroll-target="#schema-parameters">Schema Parameters</a></li>
+  <li><a href="#output-naming-convention" id="toc-output-naming-convention" class="nav-link" data-scroll-target="#output-naming-convention">Output Naming Convention</a></li>
+  </ul></li>
   <li><a href="#data-pipeline-endpoints" id="toc-data-pipeline-endpoints" class="nav-link" data-scroll-target="#data-pipeline-endpoints">3. Data Pipeline &amp; Endpoints</a>
   <ul class="collapse">
   <li><a href="#task-1-weekly-u.s.-drought-monitor-usdm-county-data" id="toc-task-1-weekly-u.s.-drought-monitor-usdm-county-data" class="nav-link" data-scroll-target="#task-1-weekly-u.s.-drought-monitor-usdm-county-data">Task 1: Weekly U.S. Drought Monitor (USDM) County Data</a></li>
@@ -5013,6 +5019,38 @@ window.Quarto = {
 <p>The Python script blocks require the following libraries: - <code>pandas</code> (Data manipulation) - <code>numpy</code> (Vector operations) - <code>requests</code> (API requests) - <code>plotly</code> (Interactive visualizations) - <code>matplotlib</code> &amp; <code>seaborn</code> (Static data validation charts)</p>
 <p>To install or update dependencies in the environment, run:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/users/brianyandell/miniconda3/envs/earth-analytics-python/bin/python</span> <span class="at">-m</span> pip install pandas requests plotly matplotlib seaborn</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+</section>
+<section id="location-configuration-config.csv" class="level2">
+<h2 class="anchored" data-anchor-id="location-configuration-config.csv">2.5. Location Configuration (<code>config.csv</code>)</h2>
+<p>By default, the project processes data for South Dakota, Oglala Lakota County, and Todd County. You can customize the state and counties analyzed by creating a <code>config.csv</code> file in the root of the repository.</p>
+<section id="configuration-templates" class="level3">
+<h3 class="anchored" data-anchor-id="configuration-templates">Configuration Templates</h3>
+<p>The repository includes two pre-configured CSV templates: - <strong><a href="config.csv.default"><code>config.csv.default</code></a></strong>: The default configuration (South Dakota, Pine Ridge, Rosebud) used for the live site. - <strong><a href="config.csv.example"><code>config.csv.example</code></a></strong>: An example configuration (Nebraska, Lancaster County) showing custom region setups.</p>
+<p>To set up a custom analysis, copy either of these templates to a new <code>config.csv</code> file in the root directory:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> config.csv.default config.csv</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># or</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> config.csv.example config.csv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="schema-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="schema-parameters">Schema Parameters</h3>
+<ul>
+<li><strong><code>type</code></strong>: Row type, either <code>state</code> or <code>county</code>.</li>
+<li><strong><code>code</code></strong>: The lowercase state abbreviation (e.g. <code>ne</code>) or the FIPS county code (e.g. <code>31107</code>).</li>
+<li><strong><code>name</code></strong>: Full official name of the state or county.</li>
+<li><strong><code>label</code></strong>: Short label for plots and legends (e.g. <code>Rosebud</code> or <code>Lancaster</code>).</li>
+</ul>
+</section>
+<section id="output-naming-convention" class="level3">
+<h3 class="anchored" data-anchor-id="output-naming-convention">Output Naming Convention</h3>
+<ul>
+<li><strong>Default state</strong>: <code>data/south_dakota_precipitation_daily.csv</code></li>
+<li><strong>Custom state</strong>: <code>data/{state_name_lower}_precipitation_daily.csv</code></li>
+<li><strong>Default counties</strong>: <code>data/oglala_lakota_drought_weekly.csv</code>, <code>data/todd_drought_weekly.csv</code></li>
+<li><strong>Custom counties</strong>: <code>data/{county_name_lower}_drought_weekly.csv</code></li>
+</ul>
+<p>The file <code>config.csv</code> is ignored in Git to prevent local region settings from overriding the default South Dakota pages deployed to GitHub Pages.</p>
 <hr>
 </section>
 </section>
@@ -5096,18 +5134,18 @@ window.Quarto = {
 <section id="custom-reset-button" class="level3">
 <h3 class="anchored" data-anchor-id="custom-reset-button">Custom Reset Button</h3>
 <p>Each Plotly figure implements a custom update menu button to restore the default zoom scale:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>updatemenus<span class="op">=</span>[</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">dict</span>(</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">type</span><span class="op">=</span><span class="st">&quot;buttons&quot;</span>,</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        buttons<span class="op">=</span>[</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>            <span class="bu">dict</span>(</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                label<span class="op">=</span><span class="st">&quot;Reset View&quot;</span>,</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                method<span class="op">=</span><span class="st">&quot;update&quot;</span>, <span class="co"># or &quot;relayout&quot;</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                args<span class="op">=</span>[{<span class="st">&quot;visible&quot;</span>: [<span class="va">True</span>] <span class="op">*</span> <span class="bu">len</span>(fig.data)}, {<span class="st">&quot;xaxis.autorange&quot;</span>: <span class="va">True</span>, <span class="st">&quot;yaxis.autorange&quot;</span>: <span class="va">True</span>}]</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        ]</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    ]</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>updatemenus<span class="op">=</span>[</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">dict</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">type</span><span class="op">=</span><span class="st">&quot;buttons&quot;</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        buttons<span class="op">=</span>[</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>            <span class="bu">dict</span>(</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                label<span class="op">=</span><span class="st">&quot;Reset View&quot;</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                method<span class="op">=</span><span class="st">&quot;update&quot;</span>, <span class="co"># or &quot;relayout&quot;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>                args<span class="op">=</span>[{<span class="st">&quot;visible&quot;</span>: [<span class="va">True</span>] <span class="op">*</span> <span class="bu">len</span>(fig.data)}, {<span class="st">&quot;xaxis.autorange&quot;</span>: <span class="va">True</span>, <span class="st">&quot;yaxis.autorange&quot;</span>: <span class="va">True</span>}]</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <hr>
 </section>
 </section>
@@ -5116,13 +5154,13 @@ window.Quarto = {
 <section id="build-the-entire-site" class="level3">
 <h3 class="anchored" data-anchor-id="build-the-entire-site">Build the Entire Site</h3>
 <p>To compile the website assets locally, execute:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>This command compiles <code>index.qmd</code>, <code>collect_data.qmd</code>, and <code>plot_records.qmd</code> into their corresponding HTML pages under the <code>docs/</code> folder.</p>
 </section>
 <section id="run-data-updates" class="level3">
 <h3 class="anchored" data-anchor-id="run-data-updates">Run Data Updates</h3>
 <p>To run the pipeline and update the data caches:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render collect_data.qmd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render collect_data.qmd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="github-pages-deployment" class="level3">
 <h3 class="anchored" data-anchor-id="github-pages-deployment">GitHub Pages Deployment</h3>
@@ -5612,163 +5650,197 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class>
-<div class="sourceCode" id="cb6" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Developer Documentation</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>Welcome to the Developer Documentation for the South Dakota Rain and Drought Analysis project. This guide provides technical onboarding, architectural details, data pipeline schema description, and local build instructions.</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">## 1. Project Directory &amp; Architecture</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>This repository is structured as a **Quarto Website** that processes and visualizes 10 years of South Dakota mean daily precipitation and county-level weekly U.S. Drought Monitor (USDM) statistics. </span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="fu">### Key Files</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[`_quarto.yml`](_quarto.yml)**: The main configuration file specifying the website title, navigation bar, format options (such as <span class="in">`embed-resources: true`</span> to generate self-contained HTML files), and the output directory (<span class="in">`docs`</span>).</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[`index.qmd`](index.qmd)**: The website&#39;s welcome page containing project goals, background, and data source links.</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[`collect_data.qmd`](collect_data.qmd)**: A Python-based data collection pipeline. It queries external REST APIs, processes raw inputs, and caches the records as CSVs in <span class="in">`data/`</span>.</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[`plot_records.qmd`](plot_records.qmd)**: A Python-based interactive dashboard that leverages **Plotly** to visualize trends and trajectories.</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[`AGENTS.md`](AGENTS.md)**: Coding style guide and instructions for AI agents.</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[`README.md`](README.md)**: Quick-start guide and general repository overview.</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="fu">### Output Layout</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>The site is compiled into the **[`docs/`](docs/)** directory:</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`docs/index.html`</span> (rendered overview)</span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`docs/collect_data.html`</span> (rendered pipeline logs and summaries)</span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`docs/plot_records.html`</span> (rendered interactive charts)</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`docs/search.json`</span> (search index for the site)</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; </span><span class="co">[</span><span class="ot">!IMPORTANT</span><span class="co">]</span></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; The directory </span><span class="in">`docs/site_libs/`</span><span class="at"> is ignored via </span><span class="co">[</span><span class="ot">`.gitignore`</span><span class="co">](.gitignore)</span><span class="at"> because all pages are compiled as standalone HTML documents with assets embedded natively. Do not stage or commit files inside </span><span class="in">`docs/site_libs/`</span><span class="at">.</span></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="fu">## 2. Local Environment Setup</span></span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>The workspace is configured to use a specific Python Conda environment.</span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="fu">### Target Executable</span></span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>Always run commands and scripts using the Earth Analytics Python environment:</span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="ex">/users/brianyandell/miniconda3/envs/earth-analytics-python/bin/python</span></span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="fu">### Dependencies</span></span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>The Python script blocks require the following libraries:</span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`pandas`</span> (Data manipulation)</span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`numpy`</span> (Vector operations)</span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`requests`</span> (API requests)</span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`plotly`</span> (Interactive visualizations)</span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`matplotlib`</span> &amp; <span class="in">`seaborn`</span> (Static data validation charts)</span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>To install or update dependencies in the environment, run:</span>
-<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
-<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a><span class="ex">/users/brianyandell/miniconda3/envs/earth-analytics-python/bin/python</span> <span class="at">-m</span> pip install pandas requests plotly matplotlib seaborn</span>
-<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a><span class="fu">## 3. Data Pipeline &amp; Endpoints</span></span>
-<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>Data collection is automated within <span class="co">[</span><span class="ot">`collect_data.qmd`</span><span class="co">](collect_data.qmd)</span>. When executed, the pipeline performs two main API tasks:</span>
-<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a><span class="fu">### Task 1: Weekly U.S. Drought Monitor (USDM) County Data</span></span>
-<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Source**: National Drought Mitigation Center (NDMC)</span>
-<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**API Endpoint**: <span class="in">`https://usdmdataservices.unl.edu/api/CountyStatistics/GetDroughtSeverityStatisticsByAreaPercent`</span></span>
-<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Request Parameters**:</span>
-<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="in">`aoi`</span>: FIPS county code (<span class="in">`46102`</span> for Oglala Lakota County, <span class="in">`46121`</span> for Todd County)</span>
-<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="in">`startdate`</span>: Dynamic start date from 10 years ago (<span class="in">`YYYY-MM-DD`</span>)</span>
-<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="in">`enddate`</span>: Today&#39;s date (<span class="in">`YYYY-MM-DD`</span>)</span>
-<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="in">`statisticsType`</span>: <span class="in">`1`</span> (representing area percent)</span>
-<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Outputs**:</span>
-<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="co">[</span><span class="ot">`data/oglala_lakota_drought_weekly.csv`</span><span class="co">](data/oglala_lakota_drought_weekly.csv)</span></span>
-<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="co">[</span><span class="ot">`data/todd_drought_weekly.csv`</span><span class="co">](data/todd_drought_weekly.csv)</span></span>
-<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a><span class="fu">### Task 2: Daily Precipitation (ACIS GridData)</span></span>
-<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Source**: NOAA Regional Climate Centers (RCCs)</span>
-<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**API Endpoint**: <span class="in">`https://data.rcc-acis.org/GridData`</span></span>
-<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**JSON Payload Parameters**:</span>
-<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="in">`state`</span>: <span class="in">`&quot;sd&quot;`</span> (South Dakota)</span>
-<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="in">`sdate`</span> / <span class="in">`edate`</span>: Start and end date range</span>
-<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="in">`grid`</span>: <span class="in">`&quot;1&quot;`</span> (NRCC Interpolated Grid)</span>
-<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="in">`elems`</span>: <span class="in">`[{&quot;name&quot;: &quot;pcpn&quot;, &quot;area_reduce&quot;: &quot;state_mean&quot;}]`</span></span>
-<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Output**:</span>
-<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="co">[</span><span class="ot">`data/south_dakota_precipitation_daily.csv`</span><span class="co">](data/south_dakota_precipitation_daily.csv)</span></span>
-<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a><span class="fu">## 4. Data Processing Standards &amp; Formulas</span></span>
-<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a>When fetching and cleaning raw data, follow these standards:</span>
-<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a><span class="fu">### Drought Severity and Coverage Index (DSCI)</span></span>
-<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a>The weekly county-level USDM statistics include five severity categories (<span class="in">`D0`</span> to <span class="in">`D4`</span>), representing the percentage area of the county experiencing that level of drought (or worse). The DSCI is calculated as the sum of these percentages:</span>
-<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a>$$\text{DSCI} = \text{D0} + \text{D1} + \text{D2} + \text{D3} + \text{D4}$$</span>
-<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The resulting DSCI ranges between <span class="in">`0`</span> (no drought) and <span class="in">`500`</span> (100% of the county is in D4 Exceptional Drought).</span>
-<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a><span class="fu">### Precipitation Clean-Up</span></span>
-<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Trace Amounts**: Daily precipitation data containing <span class="in">`&#39;T&#39;`</span> or <span class="in">`&#39;T &#39;`</span> are parsed and converted to <span class="in">`0.0001`</span> inches.</span>
-<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Missing Data**: Entries containing <span class="in">`&#39;M&#39;`</span> or empty strings are set to <span class="in">`None`</span> / <span class="in">`NaN`</span> in the data frame.</span>
-<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a><span class="fu">### Cumulative Aggregations</span></span>
-<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a>To evaluate annual progressions:</span>
-<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Group records by year (<span class="in">`date.dt.year`</span>).</span>
-<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Compute cumulative sums (<span class="in">`cumsum()`</span>) for precipitation and DSCI values starting January 1st of each year.</span>
-<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a><span class="fu">## 5. Visualizations &amp; Plotly Controls</span></span>
-<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a>The dashboard page <span class="co">[</span><span class="ot">`plot_records.qmd`</span><span class="co">](plot_records.qmd)</span> compiles three primary interactive dashboards:</span>
-<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**10-Year Timelines**: Displays weekly DSCI for both counties and the 365-day rolling statewide precipitation.</span>
-<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Annual Progression over the Year**: Standardizes month on the X-axis (<span class="in">`tickformat=&quot;%b&quot;`</span>) and cumulative values on the Y-axis. Open circles mark the end of each month.</span>
-<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Annual Trajectories of Rain vs. DSCI**: Facets the cumulative rain (X-axis) vs. cumulative DSCI (Y-axis) side-by-side. </span>
-<span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Overlaid watermark annotations (<span class="in">`DRY`</span> in top-left, <span class="in">`WET`</span> in bottom-right) indicate climate zones.</span>
-<span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a><span class="fu">### Plotly Interactive Legend Toggling</span></span>
-<span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a>To allow simultaneous visibility toggling of a specific year across multiple subplots:</span>
-<span id="cb6-116"><a href="#cb6-116" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Curves share the same <span class="in">`legendgroup`</span> name (e.g. <span class="in">`legendgroup=&quot;2020&quot;`</span>).</span>
-<span id="cb6-117"><a href="#cb6-117" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The parent layout has <span class="in">`groupclick=&quot;togglegroup&quot;`</span> set under the legend configuration.</span>
-<span id="cb6-118"><a href="#cb6-118" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-119"><a href="#cb6-119" aria-hidden="true" tabindex="-1"></a><span class="fu">### Custom Reset Button</span></span>
-<span id="cb6-120"><a href="#cb6-120" aria-hidden="true" tabindex="-1"></a>Each Plotly figure implements a custom update menu button to restore the default zoom scale:</span>
-<span id="cb6-121"><a href="#cb6-121" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
-<span id="cb6-122"><a href="#cb6-122" aria-hidden="true" tabindex="-1"></a>updatemenus<span class="op">=</span>[</span>
-<span id="cb6-123"><a href="#cb6-123" aria-hidden="true" tabindex="-1"></a>    <span class="bu">dict</span>(</span>
-<span id="cb6-124"><a href="#cb6-124" aria-hidden="true" tabindex="-1"></a>        <span class="bu">type</span><span class="op">=</span><span class="st">&quot;buttons&quot;</span>,</span>
-<span id="cb6-125"><a href="#cb6-125" aria-hidden="true" tabindex="-1"></a>        buttons<span class="op">=</span>[</span>
-<span id="cb6-126"><a href="#cb6-126" aria-hidden="true" tabindex="-1"></a>            <span class="bu">dict</span>(</span>
-<span id="cb6-127"><a href="#cb6-127" aria-hidden="true" tabindex="-1"></a>                label<span class="op">=</span><span class="st">&quot;Reset View&quot;</span>,</span>
-<span id="cb6-128"><a href="#cb6-128" aria-hidden="true" tabindex="-1"></a>                method<span class="op">=</span><span class="st">&quot;update&quot;</span>, <span class="co"># or &quot;relayout&quot;</span></span>
-<span id="cb6-129"><a href="#cb6-129" aria-hidden="true" tabindex="-1"></a>                args<span class="op">=</span>[{<span class="st">&quot;visible&quot;</span>: [<span class="va">True</span>] <span class="op">*</span> <span class="bu">len</span>(fig.data)}, {<span class="st">&quot;xaxis.autorange&quot;</span>: <span class="va">True</span>, <span class="st">&quot;yaxis.autorange&quot;</span>: <span class="va">True</span>}]</span>
-<span id="cb6-130"><a href="#cb6-130" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb6-131"><a href="#cb6-131" aria-hidden="true" tabindex="-1"></a>        ]</span>
-<span id="cb6-132"><a href="#cb6-132" aria-hidden="true" tabindex="-1"></a>    ]</span>
-<span id="cb6-133"><a href="#cb6-133" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb6-134"><a href="#cb6-134" aria-hidden="true" tabindex="-1"></a>```</span>
-<span id="cb6-135"><a href="#cb6-135" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-136"><a href="#cb6-136" aria-hidden="true" tabindex="-1"></a><span class="op">---</span></span>
-<span id="cb6-137"><a href="#cb6-137" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-138"><a href="#cb6-138" aria-hidden="true" tabindex="-1"></a><span class="co">## 6. Local Build &amp; Deployment</span></span>
-<span id="cb6-139"><a href="#cb6-139" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-140"><a href="#cb6-140" aria-hidden="true" tabindex="-1"></a><span class="co">### Build the Entire Site</span></span>
-<span id="cb6-141"><a href="#cb6-141" aria-hidden="true" tabindex="-1"></a>To <span class="bu">compile</span> the website assets locally, execute:</span>
-<span id="cb6-142"><a href="#cb6-142" aria-hidden="true" tabindex="-1"></a>```bash</span>
-<span id="cb6-143"><a href="#cb6-143" aria-hidden="true" tabindex="-1"></a>quarto render</span>
-<span id="cb6-144"><a href="#cb6-144" aria-hidden="true" tabindex="-1"></a>```</span>
-<span id="cb6-145"><a href="#cb6-145" aria-hidden="true" tabindex="-1"></a>This command compiles `index.qmd`, `collect_data.qmd`, <span class="kw">and</span> `plot_records.qmd` into their corresponding HTML pages under the `docs<span class="op">/</span>` folder.</span>
-<span id="cb6-146"><a href="#cb6-146" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-147"><a href="#cb6-147" aria-hidden="true" tabindex="-1"></a><span class="co">### Run Data Updates</span></span>
-<span id="cb6-148"><a href="#cb6-148" aria-hidden="true" tabindex="-1"></a>To run the pipeline <span class="kw">and</span> update the data caches:</span>
-<span id="cb6-149"><a href="#cb6-149" aria-hidden="true" tabindex="-1"></a>```bash</span>
-<span id="cb6-150"><a href="#cb6-150" aria-hidden="true" tabindex="-1"></a>quarto render collect_data.qmd</span>
-<span id="cb6-151"><a href="#cb6-151" aria-hidden="true" tabindex="-1"></a>```</span>
-<span id="cb6-152"><a href="#cb6-152" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-153"><a href="#cb6-153" aria-hidden="true" tabindex="-1"></a><span class="co">### GitHub Pages Deployment</span></span>
-<span id="cb6-154"><a href="#cb6-154" aria-hidden="true" tabindex="-1"></a><span class="fl">1.</span> Commit <span class="bu">all</span> modified source files (`.qmd`, `_quarto.yml`, `data<span class="op">/*</span>.csv`, `DEVELOPER.md`) <span class="kw">and</span> the compiled HTML outputs <span class="kw">in</span> `<span class="op">/</span>docs`.</span>
-<span id="cb6-155"><a href="#cb6-155" aria-hidden="true" tabindex="-1"></a><span class="fl">2.</span> Do <span class="kw">not</span> commit files inside `docs<span class="op">/</span>site_libs<span class="op">/</span>`.</span>
-<span id="cb6-156"><a href="#cb6-156" aria-hidden="true" tabindex="-1"></a><span class="fl">3.</span> Push the changes to GitHub.</span>
-<span id="cb6-157"><a href="#cb6-157" aria-hidden="true" tabindex="-1"></a><span class="fl">4.</span> Set the GitHub Pages source branch to `main` (<span class="kw">or</span> your active branch) <span class="kw">and</span> select `<span class="op">/</span>docs` <span class="im">as</span> the source folder <span class="kw">in</span> your repository settings.</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Developer Documentation</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>Welcome to the Developer Documentation for the South Dakota Rain and Drought Analysis project. This guide provides technical onboarding, architectural details, data pipeline schema description, and local build instructions.</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>***</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fu">## 1. Project Directory &amp; Architecture</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>This repository is structured as a **Quarto Website** that processes and visualizes 10 years of South Dakota mean daily precipitation and county-level weekly U.S. Drought Monitor (USDM) statistics. </span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">### Key Files</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[`_quarto.yml`](_quarto.yml)**: The main configuration file specifying the website title, navigation bar, format options (such as <span class="in">`embed-resources: true`</span> to generate self-contained HTML files), and the output directory (<span class="in">`docs`</span>).</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[`index.qmd`](index.qmd)**: The website&#39;s welcome page containing project goals, background, and data source links.</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[`collect_data.qmd`](collect_data.qmd)**: A Python-based data collection pipeline. It queries external REST APIs, processes raw inputs, and caches the records as CSVs in <span class="in">`data/`</span>.</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[`plot_records.qmd`](plot_records.qmd)**: A Python-based interactive dashboard that leverages **Plotly** to visualize trends and trajectories.</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[`AGENTS.md`](AGENTS.md)**: Coding style guide and instructions for AI agents.</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[`README.md`](README.md)**: Quick-start guide and general repository overview.</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="fu">### Output Layout</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>The site is compiled into the **[`docs/`](docs/)** directory:</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`docs/index.html`</span> (rendered overview)</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`docs/collect_data.html`</span> (rendered pipeline logs and summaries)</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`docs/plot_records.html`</span> (rendered interactive charts)</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`docs/search.json`</span> (search index for the site)</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; </span><span class="co">[</span><span class="ot">!IMPORTANT</span><span class="co">]</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; The directory </span><span class="in">`docs/site_libs/`</span><span class="at"> is ignored via </span><span class="co">[</span><span class="ot">`.gitignore`</span><span class="co">](.gitignore)</span><span class="at"> because all pages are compiled as standalone HTML documents with assets embedded natively. Do not stage or commit files inside </span><span class="in">`docs/site_libs/`</span><span class="at">.</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>***</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="fu">## 2. Local Environment Setup</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>The workspace is configured to use a specific Python Conda environment.</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a><span class="fu">### Target Executable</span></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>Always run commands and scripts using the Earth Analytics Python environment:</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a><span class="ex">/users/brianyandell/miniconda3/envs/earth-analytics-python/bin/python</span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a><span class="fu">### Dependencies</span></span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>The Python script blocks require the following libraries:</span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`pandas`</span> (Data manipulation)</span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`numpy`</span> (Vector operations)</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`requests`</span> (API requests)</span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`plotly`</span> (Interactive visualizations)</span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`matplotlib`</span> &amp; <span class="in">`seaborn`</span> (Static data validation charts)</span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>To install or update dependencies in the environment, run:</span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a><span class="ex">/users/brianyandell/miniconda3/envs/earth-analytics-python/bin/python</span> <span class="at">-m</span> pip install pandas requests plotly matplotlib seaborn</span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>***</span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a><span class="fu">## 2.5. Location Configuration (`config.csv`)</span></span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>By default, the project processes data for South Dakota, Oglala Lakota County, and Todd County. You can customize the state and counties analyzed by creating a <span class="in">`config.csv`</span> file in the root of the repository.</span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a><span class="fu">### Configuration Templates</span></span>
+<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a>The repository includes two pre-configured CSV templates:</span>
+<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[`config.csv.default`](config.csv.default)**: The default configuration (South Dakota, Pine Ridge, Rosebud) used for the live site.</span>
+<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[`config.csv.example`](config.csv.example)**: An example configuration (Nebraska, Lancaster County) showing custom region setups.</span>
+<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a>To set up a custom analysis, copy either of these templates to a new <span class="in">`config.csv`</span> file in the root directory:</span>
+<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> config.csv.default config.csv</span>
+<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a><span class="co"># or</span></span>
+<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> config.csv.example config.csv</span>
+<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a><span class="fu">### Schema Parameters</span></span>
+<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**`type`**: Row type, either <span class="in">`state`</span> or <span class="in">`county`</span>.</span>
+<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**`code`**: The lowercase state abbreviation (e.g. <span class="in">`ne`</span>) or the FIPS county code (e.g. <span class="in">`31107`</span>).</span>
+<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**`name`**: Full official name of the state or county.</span>
+<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**`label`**: Short label for plots and legends (e.g. <span class="in">`Rosebud`</span> or <span class="in">`Lancaster`</span>).</span>
+<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a><span class="fu">### Output Naming Convention</span></span>
+<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Default state**: <span class="in">`data/south_dakota_precipitation_daily.csv`</span></span>
+<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Custom state**: <span class="in">`data/{state_name_lower}_precipitation_daily.csv`</span></span>
+<span id="cb7-83"><a href="#cb7-83" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Default counties**: <span class="in">`data/oglala_lakota_drought_weekly.csv`</span>, <span class="in">`data/todd_drought_weekly.csv`</span></span>
+<span id="cb7-84"><a href="#cb7-84" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Custom counties**: <span class="in">`data/{county_name_lower}_drought_weekly.csv`</span></span>
+<span id="cb7-85"><a href="#cb7-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-86"><a href="#cb7-86" aria-hidden="true" tabindex="-1"></a>The file <span class="in">`config.csv`</span> is ignored in Git to prevent local region settings from overriding the default South Dakota pages deployed to GitHub Pages.</span>
+<span id="cb7-87"><a href="#cb7-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-88"><a href="#cb7-88" aria-hidden="true" tabindex="-1"></a>***</span>
+<span id="cb7-89"><a href="#cb7-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-90"><a href="#cb7-90" aria-hidden="true" tabindex="-1"></a><span class="fu">## 3. Data Pipeline &amp; Endpoints</span></span>
+<span id="cb7-91"><a href="#cb7-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-92"><a href="#cb7-92" aria-hidden="true" tabindex="-1"></a>Data collection is automated within <span class="co">[</span><span class="ot">`collect_data.qmd`</span><span class="co">](collect_data.qmd)</span>. When executed, the pipeline performs two main API tasks:</span>
+<span id="cb7-93"><a href="#cb7-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-94"><a href="#cb7-94" aria-hidden="true" tabindex="-1"></a><span class="fu">### Task 1: Weekly U.S. Drought Monitor (USDM) County Data</span></span>
+<span id="cb7-95"><a href="#cb7-95" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Source**: National Drought Mitigation Center (NDMC)</span>
+<span id="cb7-96"><a href="#cb7-96" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**API Endpoint**: <span class="in">`https://usdmdataservices.unl.edu/api/CountyStatistics/GetDroughtSeverityStatisticsByAreaPercent`</span></span>
+<span id="cb7-97"><a href="#cb7-97" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Request Parameters**:</span>
+<span id="cb7-98"><a href="#cb7-98" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="in">`aoi`</span>: FIPS county code (<span class="in">`46102`</span> for Oglala Lakota County, <span class="in">`46121`</span> for Todd County)</span>
+<span id="cb7-99"><a href="#cb7-99" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="in">`startdate`</span>: Dynamic start date from 10 years ago (<span class="in">`YYYY-MM-DD`</span>)</span>
+<span id="cb7-100"><a href="#cb7-100" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="in">`enddate`</span>: Today&#39;s date (<span class="in">`YYYY-MM-DD`</span>)</span>
+<span id="cb7-101"><a href="#cb7-101" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="in">`statisticsType`</span>: <span class="in">`1`</span> (representing area percent)</span>
+<span id="cb7-102"><a href="#cb7-102" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Outputs**:</span>
+<span id="cb7-103"><a href="#cb7-103" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="co">[</span><span class="ot">`data/oglala_lakota_drought_weekly.csv`</span><span class="co">](data/oglala_lakota_drought_weekly.csv)</span></span>
+<span id="cb7-104"><a href="#cb7-104" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="co">[</span><span class="ot">`data/todd_drought_weekly.csv`</span><span class="co">](data/todd_drought_weekly.csv)</span></span>
+<span id="cb7-105"><a href="#cb7-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-106"><a href="#cb7-106" aria-hidden="true" tabindex="-1"></a><span class="fu">### Task 2: Daily Precipitation (ACIS GridData)</span></span>
+<span id="cb7-107"><a href="#cb7-107" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Source**: NOAA Regional Climate Centers (RCCs)</span>
+<span id="cb7-108"><a href="#cb7-108" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**API Endpoint**: <span class="in">`https://data.rcc-acis.org/GridData`</span></span>
+<span id="cb7-109"><a href="#cb7-109" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**JSON Payload Parameters**:</span>
+<span id="cb7-110"><a href="#cb7-110" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="in">`state`</span>: <span class="in">`&quot;sd&quot;`</span> (South Dakota)</span>
+<span id="cb7-111"><a href="#cb7-111" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="in">`sdate`</span> / <span class="in">`edate`</span>: Start and end date range</span>
+<span id="cb7-112"><a href="#cb7-112" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="in">`grid`</span>: <span class="in">`&quot;1&quot;`</span> (NRCC Interpolated Grid)</span>
+<span id="cb7-113"><a href="#cb7-113" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="in">`elems`</span>: <span class="in">`[{&quot;name&quot;: &quot;pcpn&quot;, &quot;area_reduce&quot;: &quot;state_mean&quot;}]`</span></span>
+<span id="cb7-114"><a href="#cb7-114" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Output**:</span>
+<span id="cb7-115"><a href="#cb7-115" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="co">[</span><span class="ot">`data/south_dakota_precipitation_daily.csv`</span><span class="co">](data/south_dakota_precipitation_daily.csv)</span></span>
+<span id="cb7-116"><a href="#cb7-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-117"><a href="#cb7-117" aria-hidden="true" tabindex="-1"></a>***</span>
+<span id="cb7-118"><a href="#cb7-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-119"><a href="#cb7-119" aria-hidden="true" tabindex="-1"></a><span class="fu">## 4. Data Processing Standards &amp; Formulas</span></span>
+<span id="cb7-120"><a href="#cb7-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-121"><a href="#cb7-121" aria-hidden="true" tabindex="-1"></a>When fetching and cleaning raw data, follow these standards:</span>
+<span id="cb7-122"><a href="#cb7-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-123"><a href="#cb7-123" aria-hidden="true" tabindex="-1"></a><span class="fu">### Drought Severity and Coverage Index (DSCI)</span></span>
+<span id="cb7-124"><a href="#cb7-124" aria-hidden="true" tabindex="-1"></a>The weekly county-level USDM statistics include five severity categories (<span class="in">`D0`</span> to <span class="in">`D4`</span>), representing the percentage area of the county experiencing that level of drought (or worse). The DSCI is calculated as the sum of these percentages:</span>
+<span id="cb7-125"><a href="#cb7-125" aria-hidden="true" tabindex="-1"></a>$$\text{DSCI} = \text{D0} + \text{D1} + \text{D2} + \text{D3} + \text{D4}$$</span>
+<span id="cb7-126"><a href="#cb7-126" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The resulting DSCI ranges between <span class="in">`0`</span> (no drought) and <span class="in">`500`</span> (100% of the county is in D4 Exceptional Drought).</span>
+<span id="cb7-127"><a href="#cb7-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-128"><a href="#cb7-128" aria-hidden="true" tabindex="-1"></a><span class="fu">### Precipitation Clean-Up</span></span>
+<span id="cb7-129"><a href="#cb7-129" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Trace Amounts**: Daily precipitation data containing <span class="in">`&#39;T&#39;`</span> or <span class="in">`&#39;T &#39;`</span> are parsed and converted to <span class="in">`0.0001`</span> inches.</span>
+<span id="cb7-130"><a href="#cb7-130" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Missing Data**: Entries containing <span class="in">`&#39;M&#39;`</span> or empty strings are set to <span class="in">`None`</span> / <span class="in">`NaN`</span> in the data frame.</span>
+<span id="cb7-131"><a href="#cb7-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-132"><a href="#cb7-132" aria-hidden="true" tabindex="-1"></a><span class="fu">### Cumulative Aggregations</span></span>
+<span id="cb7-133"><a href="#cb7-133" aria-hidden="true" tabindex="-1"></a>To evaluate annual progressions:</span>
+<span id="cb7-134"><a href="#cb7-134" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Group records by year (<span class="in">`date.dt.year`</span>).</span>
+<span id="cb7-135"><a href="#cb7-135" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Compute cumulative sums (<span class="in">`cumsum()`</span>) for precipitation and DSCI values starting January 1st of each year.</span>
+<span id="cb7-136"><a href="#cb7-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-137"><a href="#cb7-137" aria-hidden="true" tabindex="-1"></a>***</span>
+<span id="cb7-138"><a href="#cb7-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-139"><a href="#cb7-139" aria-hidden="true" tabindex="-1"></a><span class="fu">## 5. Visualizations &amp; Plotly Controls</span></span>
+<span id="cb7-140"><a href="#cb7-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-141"><a href="#cb7-141" aria-hidden="true" tabindex="-1"></a>The dashboard page <span class="co">[</span><span class="ot">`plot_records.qmd`</span><span class="co">](plot_records.qmd)</span> compiles three primary interactive dashboards:</span>
+<span id="cb7-142"><a href="#cb7-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-143"><a href="#cb7-143" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**10-Year Timelines**: Displays weekly DSCI for both counties and the 365-day rolling statewide precipitation.</span>
+<span id="cb7-144"><a href="#cb7-144" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Annual Progression over the Year**: Standardizes month on the X-axis (<span class="in">`tickformat=&quot;%b&quot;`</span>) and cumulative values on the Y-axis. Open circles mark the end of each month.</span>
+<span id="cb7-145"><a href="#cb7-145" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Annual Trajectories of Rain vs. DSCI**: Facets the cumulative rain (X-axis) vs. cumulative DSCI (Y-axis) side-by-side. </span>
+<span id="cb7-146"><a href="#cb7-146" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Overlaid watermark annotations (<span class="in">`DRY`</span> in top-left, <span class="in">`WET`</span> in bottom-right) indicate climate zones.</span>
+<span id="cb7-147"><a href="#cb7-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-148"><a href="#cb7-148" aria-hidden="true" tabindex="-1"></a><span class="fu">### Plotly Interactive Legend Toggling</span></span>
+<span id="cb7-149"><a href="#cb7-149" aria-hidden="true" tabindex="-1"></a>To allow simultaneous visibility toggling of a specific year across multiple subplots:</span>
+<span id="cb7-150"><a href="#cb7-150" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Curves share the same <span class="in">`legendgroup`</span> name (e.g. <span class="in">`legendgroup=&quot;2020&quot;`</span>).</span>
+<span id="cb7-151"><a href="#cb7-151" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The parent layout has <span class="in">`groupclick=&quot;togglegroup&quot;`</span> set under the legend configuration.</span>
+<span id="cb7-152"><a href="#cb7-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-153"><a href="#cb7-153" aria-hidden="true" tabindex="-1"></a><span class="fu">### Custom Reset Button</span></span>
+<span id="cb7-154"><a href="#cb7-154" aria-hidden="true" tabindex="-1"></a>Each Plotly figure implements a custom update menu button to restore the default zoom scale:</span>
+<span id="cb7-155"><a href="#cb7-155" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb7-156"><a href="#cb7-156" aria-hidden="true" tabindex="-1"></a>updatemenus<span class="op">=</span>[</span>
+<span id="cb7-157"><a href="#cb7-157" aria-hidden="true" tabindex="-1"></a>    <span class="bu">dict</span>(</span>
+<span id="cb7-158"><a href="#cb7-158" aria-hidden="true" tabindex="-1"></a>        <span class="bu">type</span><span class="op">=</span><span class="st">&quot;buttons&quot;</span>,</span>
+<span id="cb7-159"><a href="#cb7-159" aria-hidden="true" tabindex="-1"></a>        buttons<span class="op">=</span>[</span>
+<span id="cb7-160"><a href="#cb7-160" aria-hidden="true" tabindex="-1"></a>            <span class="bu">dict</span>(</span>
+<span id="cb7-161"><a href="#cb7-161" aria-hidden="true" tabindex="-1"></a>                label<span class="op">=</span><span class="st">&quot;Reset View&quot;</span>,</span>
+<span id="cb7-162"><a href="#cb7-162" aria-hidden="true" tabindex="-1"></a>                method<span class="op">=</span><span class="st">&quot;update&quot;</span>, <span class="co"># or &quot;relayout&quot;</span></span>
+<span id="cb7-163"><a href="#cb7-163" aria-hidden="true" tabindex="-1"></a>                args<span class="op">=</span>[{<span class="st">&quot;visible&quot;</span>: [<span class="va">True</span>] <span class="op">*</span> <span class="bu">len</span>(fig.data)}, {<span class="st">&quot;xaxis.autorange&quot;</span>: <span class="va">True</span>, <span class="st">&quot;yaxis.autorange&quot;</span>: <span class="va">True</span>}]</span>
+<span id="cb7-164"><a href="#cb7-164" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb7-165"><a href="#cb7-165" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb7-166"><a href="#cb7-166" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb7-167"><a href="#cb7-167" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb7-168"><a href="#cb7-168" aria-hidden="true" tabindex="-1"></a>```</span>
+<span id="cb7-169"><a href="#cb7-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-170"><a href="#cb7-170" aria-hidden="true" tabindex="-1"></a><span class="op">***</span></span>
+<span id="cb7-171"><a href="#cb7-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-172"><a href="#cb7-172" aria-hidden="true" tabindex="-1"></a><span class="co">## 6. Local Build &amp; Deployment</span></span>
+<span id="cb7-173"><a href="#cb7-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-174"><a href="#cb7-174" aria-hidden="true" tabindex="-1"></a><span class="co">### Build the Entire Site</span></span>
+<span id="cb7-175"><a href="#cb7-175" aria-hidden="true" tabindex="-1"></a>To <span class="bu">compile</span> the website assets locally, execute:</span>
+<span id="cb7-176"><a href="#cb7-176" aria-hidden="true" tabindex="-1"></a>```bash</span>
+<span id="cb7-177"><a href="#cb7-177" aria-hidden="true" tabindex="-1"></a>quarto render</span>
+<span id="cb7-178"><a href="#cb7-178" aria-hidden="true" tabindex="-1"></a>```</span>
+<span id="cb7-179"><a href="#cb7-179" aria-hidden="true" tabindex="-1"></a>This command compiles `index.qmd`, `collect_data.qmd`, <span class="kw">and</span> `plot_records.qmd` into their corresponding HTML pages under the `docs<span class="op">/</span>` folder.</span>
+<span id="cb7-180"><a href="#cb7-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-181"><a href="#cb7-181" aria-hidden="true" tabindex="-1"></a><span class="co">### Run Data Updates</span></span>
+<span id="cb7-182"><a href="#cb7-182" aria-hidden="true" tabindex="-1"></a>To run the pipeline <span class="kw">and</span> update the data caches:</span>
+<span id="cb7-183"><a href="#cb7-183" aria-hidden="true" tabindex="-1"></a>```bash</span>
+<span id="cb7-184"><a href="#cb7-184" aria-hidden="true" tabindex="-1"></a>quarto render collect_data.qmd</span>
+<span id="cb7-185"><a href="#cb7-185" aria-hidden="true" tabindex="-1"></a>```</span>
+<span id="cb7-186"><a href="#cb7-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-187"><a href="#cb7-187" aria-hidden="true" tabindex="-1"></a><span class="co">### GitHub Pages Deployment</span></span>
+<span id="cb7-188"><a href="#cb7-188" aria-hidden="true" tabindex="-1"></a><span class="fl">1.</span> Commit <span class="bu">all</span> modified source files (`.qmd`, `_quarto.yml`, `data<span class="op">/*</span>.csv`, `DEVELOPER.md`) <span class="kw">and</span> the compiled HTML outputs <span class="kw">in</span> `<span class="op">/</span>docs`.</span>
+<span id="cb7-189"><a href="#cb7-189" aria-hidden="true" tabindex="-1"></a><span class="fl">2.</span> Do <span class="kw">not</span> commit files inside `docs<span class="op">/</span>site_libs<span class="op">/</span>`.</span>
+<span id="cb7-190"><a href="#cb7-190" aria-hidden="true" tabindex="-1"></a><span class="fl">3.</span> Push the changes to GitHub.</span>
+<span id="cb7-191"><a href="#cb7-191" aria-hidden="true" tabindex="-1"></a><span class="fl">4.</span> Set the GitHub Pages source branch to `main` (<span class="kw">or</span> your active branch) <span class="kw">and</span> select `<span class="op">/</span>docs` <span class="im">as</span> the source folder <span class="kw">in</span> your repository settings.</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 
