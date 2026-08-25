@@ -4799,6 +4799,7 @@ vertical-align: -.125em;
   <li><a href="#daily-historical-precipitation-records" id="toc-daily-historical-precipitation-records" class="nav-link" data-scroll-target="#daily-historical-precipitation-records">2. Daily &amp; Historical Precipitation Records</a></li>
   </ul></li>
   <li><a href="#local-data-pipeline-analysis" id="toc-local-data-pipeline-analysis" class="nav-link" data-scroll-target="#local-data-pipeline-analysis">Local Data Pipeline &amp; Analysis</a></li>
+  <li><a href="#source-code" id="toc-source-code" class="nav-link" data-scroll-target="#source-code">Source Code</a></li>
   </ul>
 </nav>
     </div>
@@ -4846,10 +4847,7 @@ vertical-align: -.125em;
 <ul>
 <li><a href="DEVELOPER.html">Developer Guide</a></li>
 <li><a href="AGENTS.html">Agent Guide</a></li>
-<li><a href="https://github.com/byandell/rainDrought">Source Code</a>
-<ul>
-<li><a href="https://github.com/byandell/rainDrought/tree/main/rainDrought">Python Code</a></li>
-</ul></li>
+<li><a href="#source-code">Source Code</a></li>
 </ul>
 <hr>
 </section>
@@ -4888,6 +4886,10 @@ vertical-align: -.125em;
 </ul></li>
 <li><strong><a href="./plot_records.html">Interactive Visualizations</a></strong>: A Plotly-based dashboard that builds timeline charts and cumulative trajectories over time and by year to compare county-specific drought progressions with precipitation.</li>
 </ol>
+</section>
+<section id="source-code" class="level1">
+<h1>Source Code</h1>
+<p>All source code is available in the GitHub repository <a href="https://github.com/byandell/rainDrought"><code>byandell/rainDrought</code></a>. Code is written in Quarto (.qmd) documents with python code chunks (.py) with the Conda environment <a href="https://github.com/earthlab/earth-analytics-python-env"><code>earth-analytics-python-env</code></a>. Python code is in folder <a href="https://github.com/byandell/rainDrought/tree/main/rainDrought/"><code>rainDrought/</code></a> while Quarto code is in the main folder. Website deployment uses GitHub Actions via the <a href="https://github.com/byandell/rainDrought/tree/main/docs"><code>docs/</code></a> folder.</p>
 
 
 <!-- -->
@@ -5384,40 +5386,53 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Developer Guide</span><span class="co">](DEVELOPER.html)</span></span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Agent Guide</span><span class="co">](AGENTS.html)</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Source Code</span><span class="co">](https://github.com/byandell/rainDrought)</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="co">[</span><span class="ot">Python Code</span><span class="co">](https://github.com/byandell/rainDrought/tree/main/rainDrought)</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="fu"># Data Sources &amp; Repositories</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>We track precipitation and drought severity metrics through several authoritative repositories.</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>Default data sources shown below are replaced with data for other counties or states by modifying <span class="in">`config.csv`</span>. (See</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Rain and Drought Records Collection</span><span class="co">](collect_data.html)</span> for more details).</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="fu">### 1. Weekly &amp; Monthly Drought Tracking</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**County Conditions dashboards (Drought.gov)**:</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="co">[</span><span class="ot">Oglala Lakota County Conditions</span><span class="co">](https://www.drought.gov/states/south-dakota/county/oglala%20lakota)</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="co">[</span><span class="ot">Todd County Conditions</span><span class="co">](https://www.drought.gov/states/south-dakota/county/todd)</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  These dashboards aggregate weekly **U.S. Drought Monitor** updates (released every Thursday) alongside the **Standardized Precipitation Index (SPI)**, which measures objective departures from normal rainfall.</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[U.S. Drought Monitor (South Dakota)](https://droughtmonitor.unl.edu/CurrentMap/StateDroughtMonitor.aspx?SD)**: Tracks percentage area classifications (from D0 &quot;Abnormally Dry&quot; to D4 &quot;Exceptional Drought&quot;) on a weekly basis across the state. Tabular data is filtered explicitly down to individual counties like Oglala Lakota (FIPS <span class="in">`46102`</span>) and Todd (FIPS <span class="in">`46121`</span>).</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2. Daily &amp; Historical Precipitation Records</span></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[South Dakota Mesonet Archives](https://sdgrass.org/tools-for-drought-planning/)**: Operated by South Dakota State University, the Mesonet offers daily cumulative curves of precipitation plotted against 30-year climate normals.</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[South Dakota Drought Dashboard](https://toolkit.climate.gov/tool/south-dakota-drought-dashboard)**: Hosted via the U.S. Climate Resilience Toolkit, offering map-based regional tracking combining short-term 1–7 day precipitation forecasts with historical monthly monitoring.</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[NCEI County-Level Climate Data](https://data.pressconnects.com/weather-data/oglala-lakota-county/46102/2024-01-01/)**: Updates monthly precipitation, rainfall, and temperature data specifically mapped to counties like Oglala Lakota and Todd.</span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="fu"># Local Data Pipeline &amp; Analysis</span></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>The project is split into two primary components:</span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**[Data Collection](collect_data.qmd)**: A Python-based Quarto pipeline that programmatically retrieves 10 years of weekly county drought data and daily South Dakota mean precipitation (via ACIS GridData and USDM API endpoints).</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Saved weekly drought records: <span class="in">`data/oglala_lakota_drought_weekly.csv`</span> and <span class="in">`data/todd_drought_weekly.csv`</span>.</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Saved daily precipitation records: <span class="in">`data/south_dakota_precipitation_daily.csv`</span>.</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**[Interactive Visualizations](plot_records.qmd)**: A Plotly-based dashboard that builds timeline charts and cumulative trajectories over time and by year to compare county-specific drought progressions with precipitation.</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></pre></div>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Source Code</span><span class="co">](#source-code)</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="fu"># Data Sources &amp; Repositories</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>We track precipitation and drought severity metrics through several authoritative repositories.</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>Default data sources shown below are replaced with data for other counties or states by modifying <span class="in">`config.csv`</span>. (See</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Rain and Drought Records Collection</span><span class="co">](collect_data.html)</span> for more details).</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="fu">### 1. Weekly &amp; Monthly Drought Tracking</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**County Conditions dashboards (Drought.gov)**:</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="co">[</span><span class="ot">Oglala Lakota County Conditions</span><span class="co">](https://www.drought.gov/states/south-dakota/county/oglala%20lakota)</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span><span class="co">[</span><span class="ot">Todd County Conditions</span><span class="co">](https://www.drought.gov/states/south-dakota/county/todd)</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  These dashboards aggregate weekly **U.S. Drought Monitor** updates (released every Thursday) alongside the **Standardized Precipitation Index (SPI)**, which measures objective departures from normal rainfall.</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[U.S. Drought Monitor (South Dakota)](https://droughtmonitor.unl.edu/CurrentMap/StateDroughtMonitor.aspx?SD)**: Tracks percentage area classifications (from D0 &quot;Abnormally Dry&quot; to D4 &quot;Exceptional Drought&quot;) on a weekly basis across the state. Tabular data is filtered explicitly down to individual counties like Oglala Lakota (FIPS <span class="in">`46102`</span>) and Todd (FIPS <span class="in">`46121`</span>).</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2. Daily &amp; Historical Precipitation Records</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[South Dakota Mesonet Archives](https://sdgrass.org/tools-for-drought-planning/)**: Operated by South Dakota State University, the Mesonet offers daily cumulative curves of precipitation plotted against 30-year climate normals.</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[South Dakota Drought Dashboard](https://toolkit.climate.gov/tool/south-dakota-drought-dashboard)**: Hosted via the U.S. Climate Resilience Toolkit, offering map-based regional tracking combining short-term 1–7 day precipitation forecasts with historical monthly monitoring.</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**[NCEI County-Level Climate Data](https://data.pressconnects.com/weather-data/oglala-lakota-county/46102/2024-01-01/)**: Updates monthly precipitation, rainfall, and temperature data specifically mapped to counties like Oglala Lakota and Todd.</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="fu"># Local Data Pipeline &amp; Analysis</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>The project is split into two primary components:</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**[Data Collection](collect_data.qmd)**: A Python-based Quarto pipeline that programmatically retrieves 10 years of weekly county drought data and daily South Dakota mean precipitation (via ACIS GridData and USDM API endpoints).</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Saved weekly drought records: <span class="in">`data/oglala_lakota_drought_weekly.csv`</span> and <span class="in">`data/todd_drought_weekly.csv`</span>.</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Saved daily precipitation records: <span class="in">`data/south_dakota_precipitation_daily.csv`</span>.</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**[Interactive Visualizations](plot_records.qmd)**: A Plotly-based dashboard that builds timeline charts and cumulative trajectories over time and by year to compare county-specific drought progressions with precipitation.</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="fu"># Source Code</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>All source code is available in the GitHub repository</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">`byandell/rainDrought`</span><span class="co">](https://github.com/byandell/rainDrought)</span>.</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>Code is written in Quarto (.qmd) documents with python code chunks (.py)</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>with the Conda environment</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">`earth-analytics-python-env`</span><span class="co">](https://github.com/earthlab/earth-analytics-python-env)</span>.</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>Python code is in folder</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">`rainDrought/`</span><span class="co">](https://github.com/byandell/rainDrought/tree/main/rainDrought/)</span></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>while Quarto code is in the main folder.</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>Website deployment uses GitHub Actions via the</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">`docs/`</span><span class="co">](https://github.com/byandell/rainDrought/tree/main/docs)</span></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>folder.</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

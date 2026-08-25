@@ -16,8 +16,7 @@ and are labeled as such in plots.
 
 - [Developer Guide](DEVELOPER.html)
 - [Agent Guide](AGENTS.html)
-- [Source Code](https://github.com/byandell/rainDrought)
-  - [Python Code](https://github.com/byandell/rainDrought/tree/main/rainDrought)
+- [Source Code](#source-code)
 
 ---
 
@@ -50,3 +49,18 @@ The project is split into two primary components:
    - Saved weekly drought records: `data/oglala_lakota_drought_weekly.csv` and `data/todd_drought_weekly.csv`.
    - Saved daily precipitation records: `data/south_dakota_precipitation_daily.csv`.
 2. **[Interactive Visualizations](plot_records.qmd)**: A Plotly-based dashboard that builds timeline charts and cumulative trajectories over time and by year to compare county-specific drought progressions with precipitation.
+
+# Source Code
+
+All source code is available in the GitHub repository
+[`byandell/rainDrought`](https://github.com/byandell/rainDrought).
+Code is written in Quarto (.qmd) documents with python code chunks (.py)
+with the Conda environment
+[`earth-analytics-python-env`](https://github.com/earthlab/earth-analytics-python-env).
+Python code is in folder
+[`rainDrought/`](https://github.com/byandell/rainDrought/tree/main/rainDrought/)
+while Quarto code is in the main folder.
+Website deployment uses GitHub Actions via the
+[`docs/`](https://github.com/byandell/rainDrought/tree/main/docs)
+folder.
+
