@@ -21,3 +21,6 @@ format:
     code-fold: true
     code-tools: true
     embed-resources: true
+    include-after-body:
+      - legend_debouncer.html
+

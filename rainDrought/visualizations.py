@@ -373,6 +373,8 @@ def plot_time_vs_cumulative(config, merged_dfs):
         margin=dict(t=90),
         legend=dict(
             groupclick="togglegroup",
+            itemdoubleclick="toggleothers",
+            itemclick="toggle",
             title_text="Year"
         ),
         updatemenus=[
@@ -398,7 +400,7 @@ def plot_time_vs_cumulative(config, merged_dfs):
         ]
     )
     fig_cum_time.update_xaxes(tickformat="%b", dtick="M1")
-    return fig_cum_time
+    return attach_debounced_legend_listener(fig_cum_time)
 
 def plot_combined_annual_trajectories(config, merged_dfs):
     """
@@ -497,6 +499,8 @@ def plot_combined_annual_trajectories(config, merged_dfs):
         margin=dict(t=65),
         legend=dict(
             groupclick="togglegroup",
+            itemdoubleclick="toggleothers",
+            itemclick="toggle",
             title_text="Year"
         ),
         updatemenus=[
@@ -523,4 +527,129 @@ def plot_combined_annual_trajectories(config, merged_dfs):
     )
     fig_combined_annual.update_xaxes(title_text="Cumulative Precipitation (inches)")
     fig_combined_annual.update_yaxes(title_text="Cumulative DSCI", row=1, col=1)
-    return fig_combined_annual
+    return attach_debounced_legend_listener(fig_combined_annual)
+
+
+LEGEND_DEBOUNCED_POST_SCRIPT = """
+(function() {
+    var gd = (typeof arguments !== 'undefined' && arguments.length > 0 && arguments[0]) ? arguments[0] : null;
+    if (!gd) {
+        var scripts = document.getElementsByTagName('script');
+        var currScript = scripts[scripts.length - 1];
+        if (currScript && currScript.previousElementSibling && currScript.previousElementSibling.classList.contains('plotly-graph-div')) {
+            gd = currScript.previousElementSibling;
+        }
+    }
+    if (!gd) {
+        var divs = document.querySelectorAll('.plotly-graph-div, .js-plotly-plot');
+        if (divs.length > 0) gd = divs[divs.length - 1];
+    }
+    if (gd && gd.on && !gd._debouncedLegendAttached) {
+        gd._debouncedLegendAttached = true;
+        var clickTimer = null;
+        var clickCount = 0;
+        var lastGroup = null;
+        var lastCurve = null;
+
+        function performSingleClick(group, curveNumber) {
+            if (!gd.data || gd.data.length === 0) return;
+            var currentVisible = gd.data[curveNumber] ? gd.data[curveNumber].visible : true;
+            var newVisible = (currentVisible === 'legendonly') ? true : 'legendonly';
+            var update = {visible: []};
+            for (var i = 0; i < gd.data.length; i++) {
+                var trace = gd.data[i];
+                if (group !== null && group !== undefined && group !== '') {
+                    if (trace.legendgroup === group) {
+                        update.visible.push(newVisible);
+                    } else {
+                        update.visible.push(trace.visible !== undefined ? trace.visible : true);
+                    }
+                } else {
+                    if (i === curveNumber) {
+                        update.visible.push(newVisible);
+                    } else {
+                        update.visible.push(trace.visible !== undefined ? trace.visible : true);
+                    }
+                }
+            }
+            Plotly.restyle(gd, update);
+        }
+
+        function performDoubleClick(group, curveNumber) {
+            if (!gd.data || gd.data.length === 0) return;
+            var otherVisible = false;
+            for (var i = 0; i < gd.data.length; i++) {
+                var trace = gd.data[i];
+                var isMatch = (group !== null && group !== undefined && group !== '') ? (trace.legendgroup === group) : (i === curveNumber);
+                if (!isMatch && trace.visible !== 'legendonly') {
+                    otherVisible = true;
+                    break;
+                }
+            }
+            var update = {visible: []};
+            for (var i = 0; i < gd.data.length; i++) {
+                var trace = gd.data[i];
+                var isMatch = (group !== null && group !== undefined && group !== '') ? (trace.legendgroup === group) : (i === curveNumber);
+                if (otherVisible) {
+                    update.visible.push(isMatch ? true : 'legendonly');
+                } else {
+                    update.visible.push(true);
+                }
+            }
+            Plotly.restyle(gd, update);
+        }
+
+        function resetState() {
+            clickCount = 0;
+            lastGroup = null;
+            lastCurve = null;
+            clickTimer = null;
+        }
+
+        gd.on('plotly_legendclick', function(data) {
+            var curveNumber = data.curveNumber;
+            var group = (data.data && data.data[curveNumber]) ? data.data[curveNumber].legendgroup : null;
+
+            if (clickTimer && (group !== lastGroup || (group === null && curveNumber !== lastCurve))) {
+                clearTimeout(clickTimer);
+                performSingleClick(lastGroup, lastCurve);
+                resetState();
+            }
+
+            clickCount++;
+            lastGroup = group;
+            lastCurve = curveNumber;
+
+            if (clickCount === 1) {
+                var targetGroup = group;
+                var targetCurve = curveNumber;
+                clickTimer = setTimeout(function() {
+                    performSingleClick(targetGroup, targetCurve);
+                    resetState();
+                }, 250);
+            } else if (clickCount >= 2) {
+                if (clickTimer) {
+                    clearTimeout(clickTimer);
+                }
+                var targetGroup = group;
+                var targetCurve = curveNumber;
+                performDoubleClick(targetGroup, targetCurve);
+                resetState();
+            }
+
+            return false;
+        });
+
+        gd.on('plotly_legenddoubleclick', function() {
+            return false;
+        });
+    }
+})();
+"""
+
+def attach_debounced_legend_listener(fig):
+    import plotly.io as pio
+    def _custom_repr_html_():
+        return pio.to_html(fig, include_plotlyjs='cdn', full_html=False, post_script=LEGEND_DEBOUNCED_POST_SCRIPT)
+    fig._repr_html_ = _custom_repr_html_
+    return fig

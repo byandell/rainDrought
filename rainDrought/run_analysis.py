@@ -75,9 +75,10 @@ def main(skip_data=False):
         cum_path = "output/cumulative_progression.html"
         traj_path = "output/trajectories.html"
         
-        fig_time.write_html(time_path)
-        fig_cum.write_html(cum_path)
-        fig_traj.write_html(traj_path)
+        from rainDrought.visualizations import LEGEND_DEBOUNCED_POST_SCRIPT
+        fig_time.write_html(time_path, post_script=LEGEND_DEBOUNCED_POST_SCRIPT)
+        fig_cum.write_html(cum_path, post_script=LEGEND_DEBOUNCED_POST_SCRIPT)
+        fig_traj.write_html(traj_path, post_script=LEGEND_DEBOUNCED_POST_SCRIPT)
         
         print(f"\nInteractive Plotly dashboards successfully saved to:")
         print(f"  - {os.path.abspath(time_path)}")

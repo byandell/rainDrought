@@ -207,6 +207,6 @@
     "href": "collect_data.html#daily-precipitation-data-summary-south-dakota",
     "title": "Rain and Drought Records Collection",
     "section": "Daily Precipitation Data Summary (South Dakota)",
-    "text": "Daily Precipitation Data Summary (South Dakota)\nNumber of daily precipitation records: 3653\n\n\n\n\n\n\n\ndate\nprecipitation_inches\n\n\n\n\n3648\n2026-08-23\n0.067627\n\n\n3649\n2026-08-24\n0.075267\n\n\n3650\n2026-08-25\n0.112057\n\n\n3651\n2026-08-26\n0.000299\n\n\n3652\n2026-08-27\nNaN\n\n\n\n\n\n\nPrecipitation Summary Stats\ncount    3652.000000\nmean        0.059772\nstd         0.124283\nmin         0.000000\n25%         0.000664\n50%         0.008864\n75%         0.056090\nmax         1.374540\nName: precipitation_inches, dtype: float64"
+    "text": "Daily Precipitation Data Summary (South Dakota)\nNumber of daily precipitation records: 3653\n\n\n\n\n\n\n\ndate\nprecipitation_inches\n\n\n\n\n3648\n2026-08-23\n0.067627\n\n\n3649\n2026-08-24\n0.075267\n\n\n3650\n2026-08-25\n0.112057\n\n\n3651\n2026-08-26\n0.000299\n\n\n3652\n2026-08-27\nNaN\n\n\n\n\n\n\nPrecipitation Summary Stats\ncount    3652.000000\nmean        0.059764\nstd         0.124284\nmin         0.000000\n25%         0.000664\n50%         0.008864\n75%         0.056090\nmax         1.374540\nName: precipitation_inches, dtype: float64"
   }
 ]
