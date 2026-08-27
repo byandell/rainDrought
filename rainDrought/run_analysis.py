@@ -18,7 +18,7 @@ from rainDrought.config import get_config
 from rainDrought.data_pipeline import run_pipeline
 from rainDrought.visualizations import load_and_preprocess, plot_time_series, plot_time_vs_cumulative, plot_combined_annual_trajectories
 
-def main():
+def main(skip_data=False):
     print("==================================================")
     print("   South Dakota Rain & Drought Analysis Runner   ")
     print("==================================================")
@@ -32,8 +32,11 @@ def main():
         print(f"    * {county['name']} (FIPS {county['fips']}, Label: {county['label']})")
 
     # 2. Run Data Collection Pipeline
-    print("\n[Step 2] Executing data collection REST API requests...")
-    run_pipeline(config)
+    if not skip_data:
+        print("\n[Step 2] Executing data collection REST API requests...")
+        run_pipeline(config)
+    else:
+        print("\n[Step 2] Skipping data collection (using cached files)...")
 
     # 3. Load Data & Log Command Line Summaries
     print("\n[Step 3] Loading cached CSV files and preprocessing...")
@@ -93,4 +96,13 @@ def main():
     print("\nAnalysis execution complete!")
 
 if __name__ == "__main__":
-    main()
+    import argparse
+    parser = argparse.ArgumentParser(description="Rain and Drought Standalone Analysis Runner.")
+    parser.add_argument(
+        "--skip-data", 
+        action="store_true", 
+        default=False, 
+        help="Skip data collection via external REST APIs and use existing cached files."
+    )
+    args = parser.parse_args()
+    main(skip_data=args.skip_data)

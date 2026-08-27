@@ -14,6 +14,7 @@ and are labeled as such in plots.
 > [!NOTE]
 > All visualizations are fully interactive. You can zoom, pan, hover to inspect raw coordinates, and click on years in the legend to toggle specific curves.
 
+- [User Guide](user_guide.html)
 - [Developer Guide](DEVELOPER.html)
 - [Agent Guide](AGENTS.html)
 - [Source Code](#source-code)
