@@ -1,37 +1,33 @@
-# Style Guide & Instructions for AI Agents
+# AGENTS.md — rainDrought
 
-Welcome, AI coding agent! Please follow these guidelines when editing or adding code to this repository:
+## Context
 
----
+- **Repository**: rainDrought — Python library for historical daily precipitation records (statewide average) and weekly U.S. Drought Monitor (USDM) statistics for counties
+- **Timeframe**: 10 years of historical data from July 2016 to the present
+- **Key Directories**: `rainDrought/`, `data/`, `docs/`
+- **Environment**: Active Python virtual environment (`~/miniconda3/envs/earth-analytics-python/bin/python`)
 
-## 1. Project Context & Scope
+## Role
 
-- **Domain**: Historical daily precipitation records (statewide average for South Dakota) and weekly U.S. Drought Monitor (USDM) statistics for South Dakota counties:
-  - **Oglala Lakota County** (FIPS code `46102`, formerly Shannon County `46113`).
-  - **Todd County** (FIPS code `46121`).
-- **Timeframe**: 10 years of historical data from July 2016 to the present.
+Act as a scientific Python developer and geospatial data engineer.
 
----
+## Action & Verification
 
-## 2. Environment & Dependencies
+- Run tests: `pytest`
+- Run linting/formatting: `ruff check` / `mypy`
+- Ensure notebooks execute cleanly from top to bottom with relative data paths.
 
-- **Target Python Executable**: Always run Python commands and scripts using the Conda environment configured for Quarto:
+## Format & Conventions
 
-  ```bash
-  /users/brianyandell/miniconda3/envs/earth-analytics-python/bin/python
-  ```
+- Modern Python type hints (`str | None`, `list[int]`, `dict[str, Any]`).
+- NumPy or Google-style docstrings on all exported functions/classes.
+- **Plotting Library**: Use **Plotly** (`plotly.graph_objects`, `plotly.express`) for main visualizations to create interactive dashboards.
 
-- **Pip Installations**: If installing Python packages, run:
+## Tone & Collaboration
 
-  ```bash
-  /users/brianyandell/miniconda3/envs/earth-analytics-python/bin/python -m pip install <package>
-  ```
+- Concise, clear, and actionable. Provide verified diffs.
 
-- **Plotting Library**: Use **Plotly** (`plotly.graph_objects`, `plotly.express`) for main visualizations in `plot_records.qmd` to create interactive dashboards.
-
----
-
-## 3. Quarto Website & Build Output
+## Quarto Website & Build Output
 
 - **Project Structure**: This repository is a Quarto Website configured via `_quarto.yml`.
 - **Output Directory**: The website builds into the `/docs` folder for GitHub Pages.
@@ -39,9 +35,7 @@ Welcome, AI coding agent! Please follow these guidelines when editing or adding 
 - **Git Ignoring**: The folder `docs/site_libs/` is ignored in `.gitignore`. **Do not track or commit `docs/site_libs/`** to the repository, as all scripts are embedded in the HTML files. Only stage the HTML files and `docs/search.json`.
 - **Build Command**: Do not render the entire website. Prompt user to run `quarto render` after significant changes.
 
----
-
-## 4. Data Processing Standards
+## Data Processing Standards
 
 - **Drought Severity and Coverage Index (USDM DSCI)**:
   - Computed using cumulative percentages: `DSCI = D0 + D1 + D2 + D3 + D4` (range `0` to `500`).
